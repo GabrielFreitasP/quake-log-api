@@ -2,11 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pckg = require('../package.json');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
 
   const options = new DocumentBuilder()
     .setTitle(pckg.name)
