@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  postgres-dev:
+    image: postgres:alpine
+    container_name: quakelog-dev
+    environment:
+      POSTGRES_USER: quakelog
+      POSTGRES_PASSWORD: quakelog
+      POSTGRES_DB: quakelog
+    ports:
+      - 5432:5432
