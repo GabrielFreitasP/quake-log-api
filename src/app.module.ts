@@ -17,7 +17,7 @@ import configuration from './commons/config/configuration';
     TypeOrmModule.forRootAsync({
       imports: [ConfigurationModule],
       useFactory: async (configurationService: ConfigurationService) => ({
-        type: 'mysql' as const,
+        type: 'postgres' as const,
         host: configurationService.databaseHost,
         port: configurationService.databasePort,
         username: configurationService.databaseUsername,
@@ -35,4 +35,4 @@ import configuration from './commons/config/configuration';
     FileModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
