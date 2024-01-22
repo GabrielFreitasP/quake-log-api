@@ -4,6 +4,9 @@ import { ConfigurationModule } from './commons/config/configuration.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigurationService } from './commons/config/configuration.service';
 import { LoggerModule } from './commons/logger/logger.module';
+import { GameModule } from './game/game.module';
+import { PlayerModule } from './player/player.module';
+import { FileModule } from './file/file.module';
 
 import configuration from './commons/config/configuration';
 
@@ -27,6 +30,9 @@ import configuration from './commons/config/configuration';
       inject: [ConfigurationService],
     }),
     LoggerModule,
+    GameModule,
+    PlayerModule,
+    FileModule,
   ],
 })
 export class AppModule { }
