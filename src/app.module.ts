@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ConfigurationModule } from './commons/config/configuration.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigurationService } from './commons/config/configuration.service';
+import { LoggerModule } from './commons/logger/logger.module';
 
 import configuration from './commons/config/configuration';
 
@@ -25,6 +26,7 @@ import configuration from './commons/config/configuration';
       }),
       inject: [ConfigurationService],
     }),
+    LoggerModule,
   ],
 })
 export class AppModule { }
