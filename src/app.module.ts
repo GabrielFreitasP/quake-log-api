@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { ConfigurationModule } from './commons/config/configuration.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,6 +13,8 @@ import { FilesModule } from './files/files.module';
 import configuration from './commons/config/configuration';
 
 @Module({
+  controllers: [AppController],
+  providers: [AppService],
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
     ConfigurationModule,
@@ -23,9 +27,11 @@ import configuration from './commons/config/configuration';
         username: configurationService.databaseUsername,
         password: configurationService.databasePassword,
         database: configurationService.databaseName,
-        entities: [__dirname + '/**/*.entity.js'],
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: configurationService.databaseSynchronize,
         logging: configurationService.databaseLogging,
+        migrations: ['../migrations/*{.ts,.js}'],
+        migrationsRun: configurationService.databaseMigrationsRun,
       }),
       inject: [ConfigurationService],
     }),
