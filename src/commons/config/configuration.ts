@@ -1,6 +1,5 @@
 export default () => ({
   port: parseInt(process.env.PORT) || 3000,
-  reportExpireDays: Number(process.env.REPORT_EXPIRE_DAYS) || 10,
   database: {
     host: process.env.DATABASE_HOST || 'localhost',
     port: parseInt(process.env.DATABASE_PORT) || 5432,
@@ -20,10 +19,12 @@ export default () => ({
     level: process.env.LOGGER_LEVEL || 'debug',
     label: process.env.LOGGER_LABEL || 'development',
   },
-  apis: {
-    serasa: {
-      baseUrl: process.env.SERASA_BASE_URL || '',
-      timeout: process.env.SERASA_TIMEOUT || 15000,
-    },
+  s3: {
+    host: process.env.S3_HOST || 'localhost',
+    port: parseInt(process.env.S3_PORT) || 9000,
+    accessKeyId: process.env.S3_ACESS_KEY_ID || 'quakelog',
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || 'quakelog',
+    forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
+    signatureVersion: process.env.S3_SIGNATURE_VERSION || 'v4',
   },
 });
