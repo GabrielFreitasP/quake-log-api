@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 @Injectable()
 export class ConfigurationService {
@@ -37,30 +38,15 @@ export class ConfigurationService {
     return Boolean(this.configService.get('database.logging'));
   }
 
+  get databaseMigrationsRun(): boolean {
+    return Boolean(this.configService.get('database.migrationsRun'));
+  }
+
   get loggerLevel(): string {
     return this.configService.get('logger.level');
   }
 
   get loggerLabel(): string {
     return this.configService.get('logger.label');
-  }
-
-  get s3Host(): string {
-    return this.configService.get('s3.host');
-  }
-  get s3Port(): number {
-    return parseInt(this.configService.get('s3.port'));
-  }
-  get s3AccessKeyId(): string {
-    return this.configService.get('s3.accessKeyId');
-  }
-  get s3SecretAccessKey(): string {
-    return this.configService.get('s3.secretAccessKey');
-  }
-  get s3ForcePathStyle(): boolean {
-    return Boolean(this.configService.get('s3.forcePathStyle'));
-  }
-  get s3SignatureVersion(): string {
-    return this.configService.get('s3.signatureVersion');
   }
 }

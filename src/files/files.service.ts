@@ -22,7 +22,7 @@ export class FilesService {
   }
 
   async create(fileEntity: FileEntity) {
-    return this.filesRepository.create(fileEntity);
+    return this.filesRepository.save(fileEntity);
   }
 
   async findAll() {

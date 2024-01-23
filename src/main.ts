@@ -3,18 +3,14 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './commons/filters/http-exception.filter';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pckg = require('../package.json');
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalFilters(new HttpExceptionFilter());
 
   const options = new DocumentBuilder()
-    .setTitle(pckg.name)
-    .setDescription(pckg.description)
-    .setVersion(pckg.version)
+    .setTitle('Quake Log API')
+    .setVersion('0.0.1')
     .addBearerAuth({ in: 'header', type: 'http' })
     .build();
 
