@@ -10,39 +10,39 @@ import { FileStatusEnum } from '../enums/file-status.enum';
 
 @Entity('files')
 export class FileEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid', { name: '' })
   id: string;
 
-  @Column()
+  @Column({ name: 'status' })
   status: FileStatusEnum;
 
-  @Column()
+  @Column({ name: 'field_name' })
   fieldName: string;
 
-  @Column()
+  @Column({ name: 'original_name' })
   originalName: string;
 
-  @Column()
+  @Column({ name: 'mime_type' })
   mimeType: string;
 
-  @Column()
+  @Column({ name: 'size' })
   size: number;
 
-  @Column()
+  @Column({ name: 'destination' })
   destination: string;
 
-  @Column()
+  @Column({ name: 'file_name' })
   fileName: string;
 
-  @Column()
+  @Column({ name: 'path' })
   path: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @DeleteDateColumn()
+  @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date;
 }
