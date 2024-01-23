@@ -4,7 +4,6 @@ import { ConfigurationModule } from './commons/config/configuration.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigurationService } from './commons/config/configuration.service';
 import { LoggerModule } from './commons/logger/logger.module';
-import { S3Module } from './commons/s3/s3.module';
 import { GameModule } from './game/game.module';
 import { PlayerModule } from './player/player.module';
 import { FilesModule } from './files/files.module';
@@ -33,7 +32,6 @@ import configuration from './commons/config/configuration';
     LoggerModule,
     GameModule,
     PlayerModule,
-    S3Module,
     FilesModule,
   ],
 })
