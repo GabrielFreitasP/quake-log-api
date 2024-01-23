@@ -1,14 +1,16 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { BullModule } from '@nestjs/bull';
+import { DataSourceOptions } from '../ormconfig';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
 import { ConfigurationModule } from './commons/config/configuration.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { LoggerModule } from './commons/logger/logger.module';
 import { GameModule } from './game/game.module';
 import { PlayerModule } from './player/player.module';
 import { FilesModule } from './files/files.module';
-import { DataSourceOptions } from '../ormconfig';
+import { ConfigurationService } from './commons/config/configuration.service';
 
 import configuration from './commons/config/configuration';
 
@@ -17,9 +19,18 @@ import configuration from './commons/config/configuration';
   providers: [AppService],
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
+    TypeOrmModule.forRoot(DataSourceOptions),
     ConfigurationModule,
-    TypeOrmModule.forRootAsync({
-      useFactory: async () => DataSourceOptions,
+    BullModule.forRootAsync({
+      imports: [ConfigurationModule],
+      useFactory: async (configurationService: ConfigurationService) => ({
+        redis: {
+          host: configurationService.redisHost,
+          port: configurationService.redisPort,
+          password: configurationService.redisPassword,
+        },
+      }),
+      inject: [ConfigurationService],
     }),
     LoggerModule,
     GameModule,
