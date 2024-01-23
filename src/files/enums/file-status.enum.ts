@@ -1,4 +1,4 @@
-export enum FilesStatusEnum {
+export enum FileStatusEnum {
   Created,
   Processing,
   Processed,
