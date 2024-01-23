@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { LoggerService } from './bucket.service';
+import { S3Service } from './s3.service';
 import { ConfigurationModule } from '../config/configuration.module';
 
 @Module({
   imports: [ConfigurationModule],
-  providers: [LoggerService],
-  exports: [LoggerService],
+  providers: [S3Service],
+  exports: [S3Service],
 })
-export class LoggerModule {}
+export class S3Module {}
