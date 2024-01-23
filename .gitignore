@@ -34,5 +34,5 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# MiniO Data
-/minio-data
+# Uploaded files
+uploads/
