@@ -6,10 +6,12 @@ import { Queue } from 'bull';
 import { Repository } from 'typeorm';
 import { InvalidArgumentException } from '../commons/exceptions/invalid-argument.exception';
 import { FileMapper } from './mappers/file.mapper';
-
-import configuration from '../commons/config/configuration';
 import { FileReader } from '../commons/readers/file.reader';
 import { FileStatusEnum } from './enums/file-status.enum';
+
+import configuration from '../commons/config/configuration';
+import { FileParser } from './file.parser';
+import { MeansOfDeathService } from '../meansofdeath/means-of-death.service';
 
 @Injectable()
 export class FileService {
@@ -17,7 +19,8 @@ export class FileService {
     @InjectRepository(File)
     private readonly repository: Repository<File>,
     @InjectQueue(configuration().files.queueName)
-    private queue: Queue<File>,
+    private readonly queue: Queue<File>,
+    private readonly meansOfDeathService: MeansOfDeathService,
   ) {}
 
   async create(fileEntity: File) {
@@ -53,9 +56,14 @@ export class FileService {
     file.status = FileStatusEnum.Processing;
     await this.update(file);
 
+    const meansOfDeath = await this.meansOfDeathService.findAll();
     const lines = FileReader.readFileLines(file.path);
-    lines.forEach(() => {
-      // TODO save games and players
-    });
+    const parser = new FileParser(file, meansOfDeath, lines);
+    parser.populateFileGames();
+
+    const populatedFile = parser.getFile();
+    console.log(populatedFile);
+
+    // TODO save new entities (Games, Players, Kills)
   }
 }

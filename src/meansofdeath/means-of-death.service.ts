@@ -10,18 +10,18 @@ export class MeansOfDeathService {
     private readonly repository: Repository<MeansOfDeath>,
   ) {}
   async save(meansOfDeath: MeansOfDeath) {
-    await this.repository.save(meansOfDeath);
+    return await this.repository.save(meansOfDeath);
   }
 
   async findAll() {
-    await this.repository.find();
+    return await this.repository.find();
   }
 
   async findOne(id: string) {
-    await this.repository.findBy({ id });
+    return await this.repository.findBy({ id });
   }
 
   async update(meansOfDeath: MeansOfDeath) {
-    await this.repository.save(meansOfDeath);
+    return await this.repository.save(meansOfDeath);
   }
 }

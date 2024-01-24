@@ -10,18 +10,18 @@ export class PlayerService {
     private readonly repository: Repository<Player>,
   ) {}
   async save(player: Player) {
-    await this.repository.save(player);
+    return await this.repository.save(player);
   }
 
   async findAll() {
-    await this.repository.find();
+    return await this.repository.find();
   }
 
   async findOne(id: string) {
-    await this.repository.findBy({ id });
+    return await this.repository.findBy({ id });
   }
 
   async update(player: Player) {
-    await this.repository.save(player);
+    return await this.repository.save(player);
   }
 }

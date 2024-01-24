@@ -8,5 +8,6 @@ import { MeansOfDeath } from './entities/means-of-death.entity';
   imports: [TypeOrmModule.forFeature([MeansOfDeath])],
   controllers: [MeansOfDeathController],
   providers: [MeansOfDeathService],
+  exports: [MeansOfDeathService],
 })
 export class MeansOfDeathModule {}

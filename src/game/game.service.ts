@@ -11,18 +11,18 @@ export class GameService {
   ) {}
 
   async save(game: Game) {
-    await this.repository.save(game);
+    return await this.repository.save(game);
   }
 
   async findAll() {
-    await this.repository.find();
+    return await this.repository.find();
   }
 
   async findOne(id: string) {
-    await this.repository.findBy({ id });
+    return await this.repository.findBy({ id });
   }
 
   async update(game: Game) {
-    await this.repository.save(game);
+    return await this.repository.save(game);
   }
 }

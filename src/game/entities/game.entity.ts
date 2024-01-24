@@ -40,4 +40,8 @@ export class Game {
 
   @OneToMany(() => Kill, (kill) => kill.game)
   killFeed: Kill[];
+
+  static generateNameByFile(file: File): string {
+    return `Game ${file.games.length + 1}`;
+  }
 }
