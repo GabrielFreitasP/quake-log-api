@@ -8,10 +8,13 @@ import { InvalidArgumentException } from '../commons/exceptions/invalid-argument
 import { FileMapper } from './mappers/file.mapper';
 import { FileReader } from '../commons/readers/file.reader';
 import { FileStatusEnum } from './enums/file-status.enum';
+import { FileParser } from './file.parser';
+import { GameService } from '../game/game.service';
+import { KillService } from '../kill/kill.service';
+import { MeansOfDeathService } from '../meansofdeath/means-of-death.service';
+import { PlayerService } from '../player/player.service';
 
 import configuration from '../commons/config/configuration';
-import { FileParser } from './file.parser';
-import { MeansOfDeathService } from '../meansofdeath/means-of-death.service';
 
 @Injectable()
 export class FileService {
@@ -20,7 +23,10 @@ export class FileService {
     private readonly repository: Repository<File>,
     @InjectQueue(configuration().files.queueName)
     private readonly queue: Queue<File>,
+    private readonly gameService: GameService,
+    private readonly killService: KillService,
     private readonly meansOfDeathService: MeansOfDeathService,
+    private readonly playerService: PlayerService,
   ) {}
 
   async create(fileEntity: File) {

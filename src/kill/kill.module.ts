@@ -8,5 +8,6 @@ import { Kill } from './entities/kill.entity';
   imports: [TypeOrmModule.forFeature([Kill])],
   controllers: [KillController],
   providers: [KillService],
+  exports: [KillService],
 })
 export class KillModule {}
