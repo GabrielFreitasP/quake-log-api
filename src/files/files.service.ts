@@ -8,6 +8,8 @@ import { InvalidArgumentException } from '../commons/exceptions/invalid-argument
 import { FileMapper } from './mappers/file.mapper';
 
 import configuration from '../commons/config/configuration';
+import { FileReader } from '../commons/readers/file.reader';
+import { FileStatusEnum } from './enums/file-status.enum';
 
 @Injectable()
 export class FilesService {
@@ -45,5 +47,15 @@ export class FilesService {
     await this.queue.add(configuration().files.jobName, newFileEntity);
 
     return newFileEntity;
+  }
+
+  async processFile(file: FileEntity) {
+    file.status = FileStatusEnum.Processing;
+    await this.update(file);
+
+    const lines = FileReader.readFileLines(file.path);
+    lines.forEach(() => {
+      // TODO save games and players
+    });
   }
 }
