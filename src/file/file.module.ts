@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { File } from './entities/file.entity';
 import { BullModule } from '@nestjs/bull';
 import { FileConsumer } from './file.consumer';
+import { MeansOfDeathModule } from '../meansofdeath/means-of-death.module';
 
 import configuration from '../commons/config/configuration';
 
@@ -18,6 +19,7 @@ import configuration from '../commons/config/configuration';
     BullModule.registerQueue({
       name: configuration().files.queueName,
     }),
+    MeansOfDeathModule,
   ],
   controllers: [FileController],
   providers: [FileService, FileConsumer],
