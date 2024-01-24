@@ -6,14 +6,14 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { FilesService } from './files.service';
+import { FileService } from './file.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('files')
 @Controller('files')
-export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+export class FileController {
+  constructor(private readonly filesService: FileService) {}
 
   @Post('upload')
   @ApiConsumes('multipart/form-data')

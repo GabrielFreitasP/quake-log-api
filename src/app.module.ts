@@ -9,7 +9,7 @@ import { ConfigurationModule } from './commons/config/configuration.module';
 import { LoggerModule } from './commons/logger/logger.module';
 import { GameModule } from './game/game.module';
 import { PlayerModule } from './player/player.module';
-import { FilesModule } from './files/files.module';
+import { FileModule } from './file/file.module';
 import { ConfigurationService } from './commons/config/configuration.service';
 
 import configuration from './commons/config/configuration';
@@ -35,7 +35,7 @@ import configuration from './commons/config/configuration';
     LoggerModule,
     GameModule,
     PlayerModule,
-    FilesModule,
+    FileModule,
   ],
 })
 export class AppModule {}
