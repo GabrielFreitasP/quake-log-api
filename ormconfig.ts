@@ -11,10 +11,9 @@ export const DataSourceOptions = {
   password: envConfig.password,
   database: envConfig.name,
   entities: [__dirname + '/**/*.entity.js'],
+  migrations: ['./migrations/*{.ts,.js}'],
   synchronize: envConfig.synchronize,
   logging: envConfig.logging,
-  migrations: [__dirname + '/migrations/*.js'],
-  migrationsRun: envConfig.migrationsRun,
 };
 
 export const AppDataSource = new DataSource(DataSourceOptions);

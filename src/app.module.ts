@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bull';
-import { DataSourceOptions } from '../ormconfig';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigurationModule } from './commons/config/configuration.module';
@@ -19,7 +18,21 @@ import configuration from './commons/config/configuration';
   providers: [AppService],
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-    TypeOrmModule.forRoot(DataSourceOptions),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigurationModule],
+      useFactory: async (configurationService: ConfigurationService) => ({
+        type: 'postgres' as const,
+        host: configurationService.databaseHost,
+        port: configurationService.databasePort,
+        username: configurationService.databaseUsername,
+        password: configurationService.databasePassword,
+        database: configurationService.databaseName,
+        entities: [__dirname + '/**/*.entity.js'],
+        synchronize: configurationService.databaseSynchronize,
+        logging: configurationService.databaseLogging,
+      }),
+      inject: [ConfigurationService],
+    }),
     ConfigurationModule,
     BullModule.forRootAsync({
       imports: [ConfigurationModule],
