@@ -10,18 +10,18 @@ export class KillService {
     private readonly repository: Repository<Kill>,
   ) {}
   async save(kill: Kill) {
-    await this.repository.save(kill);
+    return await this.repository.save(kill);
   }
 
   async findAll() {
-    await this.repository.find();
+    return await this.repository.find();
   }
 
   async findOne(id: string) {
-    await this.repository.findBy({ id });
+    return await this.repository.findBy({ id });
   }
 
   async update(kill: Kill) {
-    await this.repository.save(kill);
+    return await this.repository.save(kill);
   }
 }
