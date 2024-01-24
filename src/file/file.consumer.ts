@@ -1,16 +1,16 @@
 import { Processor, Process } from '@nestjs/bull';
 import { Job } from 'bull';
-import { FileEntity } from './entities/file.entity';
-import { FilesService } from './files.service';
+import { File } from './entities/file.entity';
+import { FileService } from './file.service';
 
 import configuration from '../commons/config/configuration';
 
 @Processor(configuration().files.queueName)
-export class FilesConsumer {
-  constructor(private readonly filesService: FilesService) {}
+export class FileConsumer {
+  constructor(private readonly filesService: FileService) {}
 
   @Process(configuration().files.jobName)
-  async processFiles(job: Job<FileEntity>) {
+  async processFiles(job: Job<File>) {
     const { data } = job;
     await this.filesService.processFile(data);
   }

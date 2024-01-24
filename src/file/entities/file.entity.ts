@@ -3,13 +3,15 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { FileStatusEnum } from '../enums/file-status.enum';
+import { Game } from '../../game/entities/game.entity';
 
 @Entity('files')
-export class FileEntity {
+export class File {
   @PrimaryGeneratedColumn('uuid', { name: '' })
   id: string;
 
@@ -45,4 +47,7 @@ export class FileEntity {
 
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date;
+
+  @OneToMany(() => Game, (game) => game.file)
+  games: Game[];
 }

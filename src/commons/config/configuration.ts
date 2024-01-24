@@ -19,8 +19,8 @@ export default () => ({
   },
   files: {
     uploadPath: process.env.FILES_UPLOAD_PATH || './uploads',
-    queueName: process.env.FILES_QUEUE_NAME || 'files-queue',
-    jobName: process.env.FILES_JOB_NAME || 'files-job',
+    queueName: process.env.FILES_QUEUE_NAME || 'file-queue',
+    jobName: process.env.FILES_JOB_NAME || 'file-job',
   },
   auth: {
     jwt: {

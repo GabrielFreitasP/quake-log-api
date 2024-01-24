@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
-import { FilesService } from './files.service';
-import { FilesController } from './files.controller';
+import { FileService } from './file.service';
+import { FileController } from './file.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FileEntity } from './entities/file.entity';
+import { File } from './entities/file.entity';
 import { BullModule } from '@nestjs/bull';
-import { FilesConsumer } from './files.consumer';
+import { FileConsumer } from './file.consumer';
 
 import configuration from '../commons/config/configuration';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([FileEntity]),
+    TypeOrmModule.forFeature([File]),
     MulterModule.register({
       dest: configuration().files.uploadPath,
     }),
@@ -19,7 +19,7 @@ import configuration from '../commons/config/configuration';
       name: configuration().files.queueName,
     }),
   ],
-  controllers: [FilesController],
-  providers: [FilesService, FilesConsumer],
+  controllers: [FileController],
+  providers: [FileService, FileConsumer],
 })
-export class FilesModule {}
+export class FileModule {}

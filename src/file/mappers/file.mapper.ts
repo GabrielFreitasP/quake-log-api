@@ -1,4 +1,4 @@
-import { FileEntity } from '../entities/file.entity';
+import { File } from '../entities/file.entity';
 import { FileStatusEnum } from '../enums/file-status.enum';
 
 export class FileMapper {
@@ -6,7 +6,7 @@ export class FileMapper {
     file: Express.Multer.File,
     status: FileStatusEnum = FileStatusEnum.Created,
   ) {
-    const fileEntity = new FileEntity();
+    const fileEntity = new File();
     fileEntity.status = status;
     fileEntity.fieldName = file.fieldname;
     fileEntity.originalName = file.originalname;

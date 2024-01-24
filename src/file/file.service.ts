@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FileEntity } from './entities/file.entity';
+import { File } from './entities/file.entity';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { Repository } from 'typeorm';
@@ -12,15 +12,15 @@ import { FileReader } from '../commons/readers/file.reader';
 import { FileStatusEnum } from './enums/file-status.enum';
 
 @Injectable()
-export class FilesService {
+export class FileService {
   constructor(
-    @InjectRepository(FileEntity)
-    private readonly repository: Repository<FileEntity>,
+    @InjectRepository(File)
+    private readonly repository: Repository<File>,
     @InjectQueue(configuration().files.queueName)
-    private queue: Queue<FileEntity>,
+    private queue: Queue<File>,
   ) {}
 
-  async create(fileEntity: FileEntity) {
+  async create(fileEntity: File) {
     return this.repository.save(fileEntity);
   }
 
@@ -32,7 +32,7 @@ export class FilesService {
     return await this.repository.findOneBy({ id });
   }
 
-  async update(fileEntity: FileEntity) {
+  async update(fileEntity: File) {
     return await this.repository.save(fileEntity);
   }
 
@@ -49,7 +49,7 @@ export class FilesService {
     return newFileEntity;
   }
 
-  async processFile(file: FileEntity) {
+  async processFile(file: File) {
     file.status = FileStatusEnum.Processing;
     await this.update(file);
 
