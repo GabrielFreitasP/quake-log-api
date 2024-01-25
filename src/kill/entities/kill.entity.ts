@@ -13,31 +13,31 @@ import { MeansOfDeath } from '../../meansofdeath/entities/means-of-death.entity'
 
 @Entity('kills')
 export class Kill {
-  @PrimaryGeneratedColumn('uuid', { name: 'id' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ManyToOne(() => Game, (game) => game.players)
-  @JoinColumn({ name: 'game_id' })
+  @JoinColumn()
   game: Game;
 
   @ManyToOne(() => Player, (player) => player.kills)
-  @JoinColumn({ name: 'killer_id' })
+  @JoinColumn()
   killer: Player;
 
   @ManyToOne(() => Player, (player) => player.deaths)
-  @JoinColumn({ name: 'victim_id' })
+  @JoinColumn()
   victim: Player;
 
   @ManyToOne(() => MeansOfDeath, (meansOfDeath) => meansOfDeath.killFeed)
-  @JoinColumn({ name: 'means_of_death_id' })
+  @JoinColumn()
   meansOfDeath: MeansOfDeath;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn()
   deletedAt: Date;
 }

@@ -12,42 +12,47 @@ import { Game } from '../../game/entities/game.entity';
 
 @Entity('files')
 export class File {
-  @PrimaryGeneratedColumn('uuid', { name: '' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'status' })
+  @Column()
   status: FileStatusEnum;
 
-  @Column({ name: 'field_name' })
+  @Column()
   fieldName: string;
 
-  @Column({ name: 'original_name' })
+  @Column()
   originalName: string;
 
-  @Column({ name: 'mime_type' })
+  @Column()
   mimeType: string;
 
-  @Column({ name: 'size' })
+  @Column()
   size: number;
 
-  @Column({ name: 'destination' })
+  @Column()
   destination: string;
 
-  @Column({ name: 'file_name' })
+  @Column()
   fileName: string;
 
-  @Column({ name: 'path' })
+  @Column()
   path: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn()
   deletedAt: Date;
 
-  @OneToMany(() => Game, (game) => game.file)
+  @OneToMany(() => Game, (game) => game.file, { cascade: true })
   games: Game[];
+
+  get lastGame() {
+    if (!this.games || this.games.length === 0) return null;
+    return this.games[this.games.length - 1];
+  }
 }

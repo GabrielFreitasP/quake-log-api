@@ -4,6 +4,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -16,32 +17,37 @@ import { Kill } from '../../kill/entities/kill.entity';
 
 @Entity('games')
 export class Game {
-  @PrimaryGeneratedColumn('uuid', { name: 'id' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ManyToOne(() => File, (file) => file.games)
-  @JoinColumn({ name: 'file_id' })
+  @JoinColumn()
   file: File;
 
-  @Column({ name: 'name' })
+  @Column()
   name: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn()
   deletedAt: Date;
 
   @ManyToMany(() => Player, (player) => player.games)
+  @JoinTable({
+    name: 'games_players',
+    joinColumn: { name: 'game_id' },
+    inverseJoinColumn: { name: 'player_id' },
+  })
   players: Player[];
 
-  @OneToMany(() => Kill, (kill) => kill.game)
+  @OneToMany(() => Kill, (kill) => kill.game, { cascade: true })
   killFeed: Kill[];
 
-  static generateNameByFile(file: File): string {
-    return `Game ${file.games.length + 1}`;
+  static generateNameByNumber(number: number): string {
+    return `Game ${number}`;
   }
 }

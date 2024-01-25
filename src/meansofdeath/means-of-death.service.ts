@@ -9,9 +9,6 @@ export class MeansOfDeathService {
     @InjectRepository(MeansOfDeath)
     private readonly repository: Repository<MeansOfDeath>,
   ) {}
-  async save(meansOfDeath: MeansOfDeath) {
-    return await this.repository.save(meansOfDeath);
-  }
 
   async findAll() {
     return await this.repository.find();
@@ -21,7 +18,7 @@ export class MeansOfDeathService {
     return await this.repository.findBy({ id });
   }
 
-  async update(meansOfDeath: MeansOfDeath) {
-    return await this.repository.save(meansOfDeath);
+  findOnArrayByTag(meansOfDeath: MeansOfDeath[], tag: string): MeansOfDeath {
+    return meansOfDeath?.find((meansOfDeath) => meansOfDeath?.tag === tag);
   }
 }

@@ -2,7 +2,7 @@ import { File } from '../entities/file.entity';
 import { FileStatusEnum } from '../enums/file-status.enum';
 
 export class FileMapper {
-  static fileToEntity(
+  static multerFileToFileEntity(
     file: Express.Multer.File,
     status: FileStatusEnum = FileStatusEnum.Created,
   ) {

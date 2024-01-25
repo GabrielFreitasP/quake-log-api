@@ -11,22 +11,22 @@ import { Kill } from '../../kill/entities/kill.entity';
 
 @Entity('means_of_death')
 export class MeansOfDeath {
-  @PrimaryGeneratedColumn('uuid', { name: 'id' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'tag' })
+  @Column({ unique: true })
   tag: string;
 
-  @Column({ name: 'description' })
+  @Column()
   description: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn()
   deletedAt: Date;
 
   @OneToMany(() => Kill, (kill) => kill.meansOfDeath)
