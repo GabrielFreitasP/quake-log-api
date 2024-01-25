@@ -19,6 +19,7 @@ import { MeansOfDeath } from '../meansofdeath/entities/means-of-death.entity';
 import { GameBuilder } from '../game/builder/game.builder';
 
 import configuration from '../commons/config/configuration';
+import { LoggerService } from '../commons/logger/logger.service';
 
 @Injectable()
 export class FileService {
@@ -27,17 +28,11 @@ export class FileService {
     private readonly repository: Repository<File>,
     @InjectQueue(configuration().files.queueName)
     private readonly queue: Queue<File>,
+    private readonly loggerService: LoggerService,
     private readonly killService: KillService,
     private readonly meansOfDeathService: MeansOfDeathService,
     private readonly playerService: PlayerService,
   ) {}
-
-  async create(fileEntity: File, manager?: EntityManager) {
-    if (manager) {
-      return await manager.save(File, fileEntity);
-    }
-    return await this.repository.save(fileEntity);
-  }
 
   async findAll() {
     return await this.repository.find();
@@ -47,11 +42,11 @@ export class FileService {
     return await this.repository.findOneBy({ id });
   }
 
-  async updateStatus({ id, status }: File, manager?: EntityManager) {
+  async create(fileEntity: File, manager?: EntityManager) {
     if (manager) {
-      return await manager.update(File, { id }, { status });
+      return await manager.save(File, fileEntity);
     }
-    return await this.repository.update({ id }, { status });
+    return await this.repository.save(fileEntity);
   }
 
   async update(fileEntity: File, manager?: EntityManager) {
@@ -59,6 +54,13 @@ export class FileService {
       return await manager.save(File, fileEntity);
     }
     return await this.repository.save(fileEntity);
+  }
+
+  async updateStatus({ id, status }: File, manager?: EntityManager) {
+    if (manager) {
+      return await manager.update(File, { id }, { status });
+    }
+    return await this.repository.update({ id }, { status });
   }
 
   async uploadFile(file: Express.Multer.File) {
@@ -101,6 +103,8 @@ export class FileService {
         await this.update(fileEntity, manager);
       });
     } catch (e) {
+      this.loggerService.error(e);
+
       fileEntity.status = FileStatusEnum.Error;
       await this.updateStatus(fileEntity);
 
@@ -165,17 +169,19 @@ export class FileService {
     cachedPlayers: Player[],
     manager: EntityManager,
   ) {
-    const player = await this.playerService.findOrCreateByLine(
-      line,
+    const playerName = this.playerService.extractNameFromLine(line);
+
+    const gamePlayer = game.players.find(({ name }) => name === playerName);
+    if (gamePlayer) return;
+
+    const player = await this.playerService.findOrCreateByName(
+      playerName,
       game,
       cachedPlayers,
       manager,
     );
 
-    const gamePlayer = game.players.find(({ name }) => name === player.name);
-    if (!gamePlayer) {
-      game.players?.push(player);
-    }
+    game.players.push(player);
   }
 
   private async addKill(

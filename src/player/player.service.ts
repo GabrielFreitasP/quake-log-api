@@ -35,21 +35,6 @@ export class PlayerService {
     return await this.repository.save(player);
   }
 
-  async findOrCreateByLine(
-    line: string,
-    game: Game,
-    cachedPlayers: Player[],
-    manager: EntityManager,
-  ) {
-    const playerName = this.extractNameFromLine(line);
-    return await this.findOrCreateByName(
-      playerName,
-      game,
-      cachedPlayers,
-      manager,
-    );
-  }
-
   async findOrCreateByName(
     playerName: string,
     game: Game,
@@ -73,7 +58,7 @@ export class PlayerService {
     return player;
   }
 
-  private extractNameFromLine(line: string) {
+  extractNameFromLine(line: string) {
     const regexPattern = new RegExp(
       `(\\d+:\\d+) ${LogTagEnum.CLIENT_USER_INFO_CHANGED}: (\\d+) n\\\\([^\\\\]+)\\\\t`,
     );

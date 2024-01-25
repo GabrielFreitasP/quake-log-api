@@ -11,6 +11,7 @@ import { MeansOfDeathModule } from '../meansofdeath/means-of-death.module';
 import { PlayerModule } from '../player/player.module';
 
 import configuration from '../commons/config/configuration';
+import { LoggerModule } from '../commons/logger/logger.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import configuration from '../commons/config/configuration';
     BullModule.registerQueue({
       name: configuration().files.queueName,
     }),
+    LoggerModule,
     KillModule,
     MeansOfDeathModule,
     PlayerModule,
