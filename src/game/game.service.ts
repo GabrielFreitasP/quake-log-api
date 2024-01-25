@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Game } from './entities/game.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 
 @Injectable()
 export class GameService {
@@ -10,8 +10,12 @@ export class GameService {
     private readonly repository: Repository<Game>,
   ) {}
 
-  async save(game: Game) {
-    return await this.repository.save(game);
+  async create(game: Game, manager?: EntityManager) {
+    if (manager) {
+      return await manager.save(Game, game);
+    } else {
+      return await this.repository.save(game);
+    }
   }
 
   async findAll() {
@@ -20,9 +24,5 @@ export class GameService {
 
   async findOne(id: string) {
     return await this.repository.findBy({ id });
-  }
-
-  async update(game: Game) {
-    return await this.repository.save(game);
   }
 }
