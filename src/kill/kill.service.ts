@@ -9,7 +9,6 @@ import { KillLineDto } from './dto/kill-line.dto';
 import { LogTagEnum } from '../file/enums/log-tag.enum';
 import { KillBuilder } from './builder/kill.builder';
 import { PlayerService } from '../player/player.service';
-import { MeansOfDeathService } from '../meansofdeath/means-of-death.service';
 
 @Injectable()
 export class KillService {
@@ -17,16 +16,7 @@ export class KillService {
     @InjectRepository(Kill)
     private readonly repository: Repository<Kill>,
     private readonly playerService: PlayerService,
-    private readonly meansOfDeathService: MeansOfDeathService,
   ) {}
-
-  async create(kill: Kill, manager?: EntityManager) {
-    if (manager) {
-      return await manager.save(kill);
-    } else {
-      return await this.repository.save(kill);
-    }
-  }
 
   async findAll() {
     return await this.repository.find();
@@ -40,45 +30,28 @@ export class KillService {
     line: string,
     game: Game,
     cachedPlayers: Player[],
-    meansOfDeath: MeansOfDeath[],
-    manager?: EntityManager,
-  ) {
-    const killLine = this.extractKillFromLine(line);
-    return await this.createKillerOrVictimIfNotExists(
-      killLine,
-      game,
-      meansOfDeath,
-      cachedPlayers,
-      manager,
-    );
-  }
-
-  async createKillerOrVictimIfNotExists(
-    killLine: KillLineDto,
-    game: Game,
     cachedMeansOfDeath: MeansOfDeath[],
-    cachedPlayers?: Player[],
-    manager?: EntityManager,
+    manager: EntityManager,
   ) {
-    const { killerName, victimName, meansOfDeathTag } = killLine;
+    const { killerName, victimName, meansOfDeathTag } =
+      this.extractKillFromLine(line);
 
-    const killer = await this.playerService.getOrCreateIfNotExistBy(
+    const killer = await this.playerService.findOrCreateByName(
       killerName,
       game,
       cachedPlayers,
       manager,
     );
 
-    const victim = await this.playerService.getOrCreateIfNotExistBy(
+    const victim = await this.playerService.findOrCreateByName(
       victimName,
       game,
       cachedPlayers,
       manager,
     );
 
-    const meansOfDeath = this.meansOfDeathService.findOnArrayByTag(
-      cachedMeansOfDeath,
-      meansOfDeathTag,
+    const meansOfDeath = cachedMeansOfDeath.find(
+      ({ tag }) => tag === meansOfDeathTag,
     );
 
     return KillBuilder.buildKill(game, killer, victim, meansOfDeath);

@@ -79,32 +79,22 @@ export class FileService {
       fileEntity.status = FileStatusEnum.Processing;
       await this.updateStatus(fileEntity);
 
-      const meansOfDeath = await this.meansOfDeathService.findAll();
       const lines = FileReader.readFileLines(fileEntity.path);
+      const cachedMeansOfDeath = await this.meansOfDeathService.findAll();
       const cachedPlayers: Player[] = [];
       let currentGame: Game;
       fileEntity.games = [];
 
       await this.repository.manager.transaction(async (manager) => {
         for (const line of lines) {
-          switch (this.getLineType(line)) {
-            case LineTypeEnum.START_GAME:
-              currentGame = this.startGame(fileEntity);
-              fileEntity.games.push(currentGame);
-              break;
-            case LineTypeEnum.CHANGE_PLAYER:
-              await this.addPlayer(line, currentGame, cachedPlayers, manager);
-              break;
-            case LineTypeEnum.KILL:
-              await this.addKill(
-                line,
-                currentGame,
-                cachedPlayers,
-                meansOfDeath,
-                manager,
-              );
-              break;
-          }
+          currentGame = await this.processLine(
+            line,
+            fileEntity,
+            currentGame,
+            cachedPlayers,
+            cachedMeansOfDeath,
+            manager,
+          );
         }
 
         fileEntity.status = FileStatusEnum.Done;
@@ -114,7 +104,6 @@ export class FileService {
       fileEntity.status = FileStatusEnum.Error;
       await this.updateStatus(fileEntity);
 
-      console.error(e);
       throw e;
     }
   }
@@ -132,16 +121,42 @@ export class FileService {
       return LineTypeEnum.KILL;
     }
 
-    if (line.includes(LogTagEnum.SHUTDOWN_GAME + ':')) {
-      return LineTypeEnum.END_GAME;
-    }
-
     return null;
   }
 
-  private startGame(fileEntity: File) {
+  private async processLine(
+    line: string,
+    fileEntity: File,
+    currentGame: Game,
+    cachedPlayers: Player[],
+    cachedMeansOfDeath: MeansOfDeath[],
+    manager: EntityManager,
+  ) {
+    switch (this.getLineType(line)) {
+      case LineTypeEnum.START_GAME:
+        currentGame = this.addGame(fileEntity);
+        break;
+      case LineTypeEnum.CHANGE_PLAYER:
+        await this.addPlayer(line, currentGame, cachedPlayers, manager);
+        break;
+      case LineTypeEnum.KILL:
+        await this.addKill(
+          line,
+          currentGame,
+          cachedPlayers,
+          cachedMeansOfDeath,
+          manager,
+        );
+        break;
+    }
+    return currentGame;
+  }
+
+  private addGame(fileEntity: File) {
     const gameNumber = (fileEntity.games?.length ?? 0) + 1;
-    return GameBuilder.buildGame(fileEntity, gameNumber);
+    const game = GameBuilder.buildGame(fileEntity, gameNumber);
+    fileEntity.games.push(game);
+    return game;
   }
 
   private async addPlayer(
@@ -150,17 +165,14 @@ export class FileService {
     cachedPlayers: Player[],
     manager: EntityManager,
   ) {
-    const player = await this.playerService.getOrCreateByLine(
+    const player = await this.playerService.findOrCreateByLine(
       line,
       game,
       cachedPlayers,
       manager,
     );
 
-    const gamePlayer = this.playerService.findOnArrayByName(
-      game.players,
-      player.name,
-    );
+    const gamePlayer = game.players.find(({ name }) => name === player.name);
     if (!gamePlayer) {
       game.players?.push(player);
     }
@@ -170,14 +182,14 @@ export class FileService {
     line: string,
     game: Game,
     cachedPlayers: Player[],
-    meansOfDeath: MeansOfDeath[],
+    cachedMeansOfDeath: MeansOfDeath[],
     manager: EntityManager,
   ) {
     const kill = await this.killService.createByLine(
       line,
       game,
       cachedPlayers,
-      meansOfDeath,
+      cachedMeansOfDeath,
       manager,
     );
 
