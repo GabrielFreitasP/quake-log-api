@@ -19,6 +19,7 @@ import { MeansOfDeath } from '../meansofdeath/entities/means-of-death.entity';
 import { GameBuilder } from '../game/builder/game.builder';
 
 import configuration from '../commons/config/configuration';
+import { LoggerService } from '../commons/logger/logger.service';
 
 @Injectable()
 export class FileService {
@@ -27,17 +28,11 @@ export class FileService {
     private readonly repository: Repository<File>,
     @InjectQueue(configuration().files.queueName)
     private readonly queue: Queue<File>,
+    private readonly loggerService: LoggerService,
     private readonly killService: KillService,
     private readonly meansOfDeathService: MeansOfDeathService,
     private readonly playerService: PlayerService,
   ) {}
-
-  async create(fileEntity: File, manager?: EntityManager) {
-    if (manager) {
-      return await manager.save(File, fileEntity);
-    }
-    return await this.repository.save(fileEntity);
-  }
 
   async findAll() {
     return await this.repository.find();
@@ -47,11 +42,11 @@ export class FileService {
     return await this.repository.findOneBy({ id });
   }
 
-  async updateStatus({ id, status }: File, manager?: EntityManager) {
+  async create(fileEntity: File, manager?: EntityManager) {
     if (manager) {
-      return await manager.update(File, { id }, { status });
+      return await manager.save(File, fileEntity);
     }
-    return await this.repository.update({ id }, { status });
+    return await this.repository.save(fileEntity);
   }
 
   async update(fileEntity: File, manager?: EntityManager) {
@@ -59,6 +54,13 @@ export class FileService {
       return await manager.save(File, fileEntity);
     }
     return await this.repository.save(fileEntity);
+  }
+
+  async updateStatus({ id, status }: File, manager?: EntityManager) {
+    if (manager) {
+      return await manager.update(File, { id }, { status });
+    }
+    return await this.repository.update({ id }, { status });
   }
 
   async uploadFile(file: Express.Multer.File) {
@@ -79,42 +81,33 @@ export class FileService {
       fileEntity.status = FileStatusEnum.Processing;
       await this.updateStatus(fileEntity);
 
-      const meansOfDeath = await this.meansOfDeathService.findAll();
       const lines = FileReader.readFileLines(fileEntity.path);
+      const cachedMeansOfDeath = await this.meansOfDeathService.findAll();
       const cachedPlayers: Player[] = [];
       let currentGame: Game;
       fileEntity.games = [];
 
       await this.repository.manager.transaction(async (manager) => {
         for (const line of lines) {
-          switch (this.getLineType(line)) {
-            case LineTypeEnum.START_GAME:
-              currentGame = this.startGame(fileEntity);
-              fileEntity.games.push(currentGame);
-              break;
-            case LineTypeEnum.CHANGE_PLAYER:
-              await this.addPlayer(line, currentGame, cachedPlayers, manager);
-              break;
-            case LineTypeEnum.KILL:
-              await this.addKill(
-                line,
-                currentGame,
-                cachedPlayers,
-                meansOfDeath,
-                manager,
-              );
-              break;
-          }
+          currentGame = await this.processLine(
+            line,
+            fileEntity,
+            currentGame,
+            cachedPlayers,
+            cachedMeansOfDeath,
+            manager,
+          );
         }
 
         fileEntity.status = FileStatusEnum.Done;
         await this.update(fileEntity, manager);
       });
     } catch (e) {
+      this.loggerService.error(e);
+
       fileEntity.status = FileStatusEnum.Error;
       await this.updateStatus(fileEntity);
 
-      console.error(e);
       throw e;
     }
   }
@@ -132,16 +125,42 @@ export class FileService {
       return LineTypeEnum.KILL;
     }
 
-    if (line.includes(LogTagEnum.SHUTDOWN_GAME + ':')) {
-      return LineTypeEnum.END_GAME;
-    }
-
     return null;
   }
 
-  private startGame(fileEntity: File) {
+  private async processLine(
+    line: string,
+    fileEntity: File,
+    currentGame: Game,
+    cachedPlayers: Player[],
+    cachedMeansOfDeath: MeansOfDeath[],
+    manager: EntityManager,
+  ) {
+    switch (this.getLineType(line)) {
+      case LineTypeEnum.START_GAME:
+        currentGame = this.addGame(fileEntity);
+        break;
+      case LineTypeEnum.CHANGE_PLAYER:
+        await this.addPlayer(line, currentGame, cachedPlayers, manager);
+        break;
+      case LineTypeEnum.KILL:
+        await this.addKill(
+          line,
+          currentGame,
+          cachedPlayers,
+          cachedMeansOfDeath,
+          manager,
+        );
+        break;
+    }
+    return currentGame;
+  }
+
+  private addGame(fileEntity: File) {
     const gameNumber = (fileEntity.games?.length ?? 0) + 1;
-    return GameBuilder.buildGame(fileEntity, gameNumber);
+    const game = GameBuilder.buildGame(fileEntity, gameNumber);
+    fileEntity.games.push(game);
+    return game;
   }
 
   private async addPlayer(
@@ -150,34 +169,33 @@ export class FileService {
     cachedPlayers: Player[],
     manager: EntityManager,
   ) {
-    const player = await this.playerService.getOrCreateByLine(
-      line,
+    const playerName = this.playerService.extractNameFromLine(line);
+
+    const gamePlayer = game.players.find(({ name }) => name === playerName);
+    if (gamePlayer) return;
+
+    const player = await this.playerService.findOrCreateByName(
+      playerName,
       game,
       cachedPlayers,
       manager,
     );
 
-    const gamePlayer = this.playerService.findOnArrayByName(
-      game.players,
-      player.name,
-    );
-    if (!gamePlayer) {
-      game.players?.push(player);
-    }
+    game.players.push(player);
   }
 
   private async addKill(
     line: string,
     game: Game,
     cachedPlayers: Player[],
-    meansOfDeath: MeansOfDeath[],
+    cachedMeansOfDeath: MeansOfDeath[],
     manager: EntityManager,
   ) {
     const kill = await this.killService.createByLine(
       line,
       game,
       cachedPlayers,
-      meansOfDeath,
+      cachedMeansOfDeath,
       manager,
     );
 

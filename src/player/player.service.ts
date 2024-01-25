@@ -13,24 +13,11 @@ export class PlayerService {
     private readonly repository: Repository<Player>,
   ) {}
 
-  async create(player: Player, manager?: EntityManager) {
-    if (manager) {
-      return await manager.save(Player, player);
-    }
-    return await this.repository.save(player);
-  }
-
-  async findAll(manager?: EntityManager) {
-    if (manager) {
-      return await manager.find(Player);
-    }
+  async findAll() {
     return await this.repository.find();
   }
 
-  async findOne(id: string, manager?: EntityManager) {
-    if (manager) {
-      return await manager.findBy(Player, { id });
-    }
+  async findOne(id: string) {
     return await this.repository.findBy({ id });
   }
 
@@ -41,32 +28,20 @@ export class PlayerService {
     return await this.repository.findBy({ name });
   }
 
-  findOnArrayByName(players: Player[], playerName: string): Player {
-    return players?.find((player) => player?.name === playerName);
+  async create(player: Player, manager?: EntityManager) {
+    if (manager) {
+      return await manager.save(Player, player);
+    }
+    return await this.repository.save(player);
   }
 
-  async getOrCreateByLine(
-    line: string,
-    game: Game,
-    cachedPlayers: Player[],
-    manager?: EntityManager,
-  ) {
-    const playerName = this.extractPlayerNameFromLine(line);
-    return await this.getOrCreateIfNotExistBy(
-      playerName,
-      game,
-      cachedPlayers,
-      manager,
-    );
-  }
-
-  async getOrCreateIfNotExistBy(
+  async findOrCreateByName(
     playerName: string,
     game: Game,
     cachedPlayers: Player[],
-    manager?: EntityManager,
+    manager: EntityManager,
   ) {
-    let player = this.findOnArrayByName(cachedPlayers, playerName);
+    let player = cachedPlayers.find(({ name }) => name === playerName);
 
     if (!player) {
       const players = await this.findByName(playerName, manager);
@@ -83,7 +58,7 @@ export class PlayerService {
     return player;
   }
 
-  private extractPlayerNameFromLine(line: string) {
+  extractNameFromLine(line: string) {
     const regexPattern = new RegExp(
       `(\\d+:\\d+) ${LogTagEnum.CLIENT_USER_INFO_CHANGED}: (\\d+) n\\\\([^\\\\]+)\\\\t`,
     );

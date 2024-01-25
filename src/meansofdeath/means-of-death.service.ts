@@ -17,8 +17,4 @@ export class MeansOfDeathService {
   async findOne(id: string) {
     return await this.repository.findBy({ id });
   }
-
-  findOnArrayByTag(meansOfDeath: MeansOfDeath[], tag: string): MeansOfDeath {
-    return meansOfDeath?.find((meansOfDeath) => meansOfDeath?.tag === tag);
-  }
 }

@@ -50,9 +50,4 @@ export class File {
 
   @OneToMany(() => Game, (game) => game.file, { cascade: true })
   games: Game[];
-
-  get lastGame() {
-    if (!this.games || this.games.length === 0) return null;
-    return this.games[this.games.length - 1];
-  }
 }
