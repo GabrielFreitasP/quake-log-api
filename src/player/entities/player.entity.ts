@@ -4,6 +4,7 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -13,19 +14,19 @@ import { Kill } from '../../kill/entities/kill.entity';
 
 @Entity('players')
 export class Player {
-  @PrimaryGeneratedColumn('uuid', { name: 'id' })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'name' })
+  @Column({ unique: true })
   name: string;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn()
   deletedAt: Date;
 
   @ManyToMany(() => Game, (game) => game.players)
