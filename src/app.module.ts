@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bull';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigurationModule } from './commons/config/configuration.module';
@@ -30,6 +31,7 @@ import configuration from './commons/config/configuration';
         entities: [__dirname + '/**/*.entity.js'],
         synchronize: configurationService.databaseSynchronize,
         logging: configurationService.databaseLogging,
+        namingStrategy: new SnakeNamingStrategy(),
       }),
       inject: [ConfigurationService],
     }),
