@@ -3,17 +3,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform, TransformFnParams } from 'class-transformer';
 
 export class RequestLoginDto {
-  @ApiProperty({
-    description: 'Email to login',
-    example: 'admin@admin.com.br',
-  })
+  @ApiProperty({ description: 'Login email', example: 'johnbeats@email.com' })
   @IsEmail()
   email: string;
 
-  @ApiProperty({
-    description: 'Password to login',
-    example: '123456',
-  })
+  @ApiProperty({ description: 'Login password', example: '123456' })
   @Transform(({ value }: TransformFnParams) => value.toString())
   @IsNotEmpty()
   @IsString()
