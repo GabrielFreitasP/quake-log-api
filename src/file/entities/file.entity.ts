@@ -9,10 +9,12 @@ import {
 } from 'typeorm';
 import { FileStatusEnum } from '../enums/file-status.enum';
 import { Game } from '../../game/entities/game.entity';
+import { IsUUID } from 'class-validator';
 
 @Entity('files')
 export class File {
   @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   id: string;
 
   @Column()

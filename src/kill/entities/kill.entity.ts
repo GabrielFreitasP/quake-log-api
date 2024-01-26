@@ -10,10 +10,12 @@ import {
 import { Game } from '../../game/entities/game.entity';
 import { Player } from '../../player/entities/player.entity';
 import { MeansOfDeath } from '../../meansofdeath/entities/means-of-death.entity';
+import { IsUUID } from 'class-validator';
 
 @Entity('kills')
 export class Kill {
   @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   id: string;
 
   @ManyToOne(() => Game, (game) => game.kills)
