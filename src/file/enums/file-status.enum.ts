@@ -1,6 +1,6 @@
 export enum FileStatusEnum {
-  Created,
-  Processing,
-  Done,
-  Error,
+  CREATED = 'created',
+  PROCESSING = 'processing',
+  DONE = 'done',
+  FAILED = 'failed',
 }

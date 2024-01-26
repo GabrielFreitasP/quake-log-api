@@ -6,11 +6,14 @@ import {
   UploadedFile,
   UseInterceptors,
   ParseUUIDPipe,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { FileService } from './file.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { HttpSuccessFilter } from '../commons/filters/http-success.filter';
+import { raw } from 'express';
 
 @Controller('api/v1/files')
 @ApiTags('files')
@@ -39,6 +42,7 @@ export class FileController {
   }
 
   @Post('upload')
+  @HttpCode(201)
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(HttpSuccessFilter)
   @ApiBody({

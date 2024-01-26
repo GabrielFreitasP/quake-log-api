@@ -20,10 +20,11 @@ import { ScoreService } from '../score/score.service';
 import { KillsByPlayersDto } from '../game/dto/kills-by-players.dto';
 import { KillsByMeansDto } from '../game/dto/kills-by-means.dto';
 import { BuildGame } from '../game/builder/game.builder';
-import { MulterFileToFileEntity } from './mappers/file.mapper';
+
 import { GameEntityToKillsByPlayersDto } from '../game/mappers/game.mapper';
 
 import configuration from '../commons/config/configuration';
+import { FileResponseDto } from './dto/file-response.dto';
 
 @Injectable()
 export class FileService {
@@ -102,7 +103,7 @@ export class FileService {
   }
 
   async create(fileEntity: File, manager?: EntityManager) {
-    this.logger.debug(`Creating file: ${fileEntity.fileName}`);
+    this.logger.debug(`Creating file: ${fileEntity.filename}`);
     if (manager) {
       return await manager.save(File, fileEntity);
     }
@@ -126,25 +127,25 @@ export class FileService {
   }
 
   async uploadFile(file: Express.Multer.File) {
-    this.logger.debug(`Uploading file: ${file.filename}`);
-
     if (!file) {
       throw new InvalidArgumentException({ file });
     }
 
-    const fileEntity = MulterFileToFileEntity(file);
+    this.logger.debug(`Uploading file: ${file.filename}`);
+
+    const fileEntity = new File().fromMulterFile(file);
     const newFileEntity = await this.create(fileEntity);
 
     this.logger.debug(`Add file (${fileEntity.id}) to queue: ${file.filename}`);
     await this.queue.add(configuration().files.jobName, newFileEntity);
 
-    return newFileEntity;
+    return new FileResponseDto().fromEntity(fileEntity);
   }
 
   async processFile(fileEntity: File) {
     this.logger.debug(`Starting processing file: ${fileEntity.id}`);
 
-    fileEntity.status = FileStatusEnum.Processing;
+    fileEntity.status = FileStatusEnum.PROCESSING;
     await this.updateStatus(fileEntity);
 
     try {
@@ -166,7 +167,7 @@ export class FileService {
           );
         }
 
-        fileEntity.status = FileStatusEnum.Done;
+        fileEntity.status = FileStatusEnum.DONE;
         await this.update(fileEntity, manager);
       });
 
@@ -176,7 +177,7 @@ export class FileService {
         `Error processing file (${fileEntity.id}): ${e.message}`,
       );
 
-      fileEntity.status = FileStatusEnum.Error;
+      fileEntity.status = FileStatusEnum.FAILED;
       await this.updateStatus(fileEntity);
 
       throw e;

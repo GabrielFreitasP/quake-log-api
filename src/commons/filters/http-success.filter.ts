@@ -18,26 +18,19 @@ export class HttpSuccessFilter<T> implements NestInterceptor<T> {
         const request = context.getArgs()[0];
         const offset = parseInt(request.query.offset || 1);
         const limit = parseInt(request.query.limit || 100);
-        let meta = {
-          serverName: hostName,
-          path: request.url,
-          timestamp: new Date().toISOString(),
-        };
 
         if (data?.pageCount) {
-          meta = {
-            ...meta,
+          return {
             ...{
               itemCount: data.itemCount,
               limit,
               offset,
             },
+            date: data.items,
           };
-
-          data = data.items;
         }
 
-        return { meta, data };
+        return data;
       }),
     );
   }

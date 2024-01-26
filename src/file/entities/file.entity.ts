@@ -26,8 +26,8 @@ export class File {
   @Column()
   originalName: string;
 
-  @Column()
-  mimeType: string;
+  @Column({ name: 'mime_type' })
+  mimetype: string;
 
   @Column({ type: 'int' })
   size: number;
@@ -35,8 +35,8 @@ export class File {
   @Column()
   destination: string;
 
-  @Column()
-  fileName: string;
+  @Column({ name: 'file_name' })
+  filename: string;
 
   @Column()
   path: string;
@@ -52,4 +52,20 @@ export class File {
 
   @OneToMany(() => Game, (game) => game.file, { cascade: true })
   games: Game[];
+
+  fromMulterFile(
+    file: Express.Multer.File,
+    status: FileStatusEnum = FileStatusEnum.CREATED,
+  ) {
+    const fileEntity = new File();
+    fileEntity.status = status;
+    fileEntity.fieldName = file.fieldname;
+    fileEntity.originalName = file.originalname;
+    fileEntity.mimetype = file.mimetype;
+    fileEntity.size = file.size;
+    fileEntity.destination = file.destination;
+    fileEntity.filename = file.filename;
+    fileEntity.path = file.path;
+    return fileEntity;
+  }
 }
