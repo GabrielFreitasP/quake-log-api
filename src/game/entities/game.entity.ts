@@ -13,7 +13,8 @@ import {
 import { File } from '../../file/entities/file.entity';
 import { Player } from '../../player/entities/player.entity';
 import { Kill } from '../../kill/entities/kill.entity';
-import { PlayerGame } from '../../playergame/entities/player-game.entity';
+import { Score } from '../../score/entities/score.entity';
+import { BuildScore } from '../../score/builder/score.builder';
 
 @Entity('games')
 export class Game {
@@ -23,9 +24,6 @@ export class Game {
   @ManyToOne(() => File, (file) => file.games)
   @JoinColumn()
   file: File;
-
-  @Column()
-  name: string;
 
   @Column({ type: 'int', default: 0 })
   totalKills: number;
@@ -42,20 +40,27 @@ export class Game {
   @OneToMany(() => Kill, (kill) => kill.game, { cascade: true })
   killFeed: Kill[];
 
-  @OneToMany(() => PlayerGame, (playerGame) => playerGame.game, {
+  @OneToMany(() => Score, (scores) => scores.game, {
     cascade: true,
   })
-  playerGames: PlayerGame[];
+  scores: Score[];
 
-  players: Player[];
+  static buildNameByIndex(index: number) {
+    return `game${index + 1}`;
+  }
+
+  get players() {
+    return this.scores?.map((score) => score.player);
+  }
+
+  addPlayer(player: Player) {
+    if (!this.scores) this.scores = [];
+    this.scores.push(BuildScore(this, player, 0));
+  }
 
   @BeforeInsert()
   setTotalKill() {
     if (!this.killFeed) return 0;
     this.totalKills = this.killFeed.length;
-  }
-
-  static generateNameByNumber(number: number): string {
-    return `Game ${number}`;
   }
 }

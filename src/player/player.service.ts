@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { Player } from './entities/player.entity';
 import { Game } from '../game/entities/game.entity';
-import { PlayerBuilder } from './builder/player.builder';
+import { BuildPlayer } from './builder/player.builder';
 import { LogTagEnum } from '../file/enums/log-tag.enum';
 
 @Injectable()
@@ -48,7 +48,7 @@ export class PlayerService {
       player = players?.at(0);
 
       if (!player) {
-        player = PlayerBuilder.buildPlayer(game, playerName);
+        player = BuildPlayer(playerName);
         player = await this.create(player, manager);
       }
 

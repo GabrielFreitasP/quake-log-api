@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Kill } from '../../kill/entities/kill.entity';
-import { PlayerGame } from '../../playergame/entities/player-game.entity';
+import { Score } from '../../score/entities/score.entity';
 
 const WORLD_PLAYER_NAME = '<world>';
 
@@ -35,8 +35,8 @@ export class Player {
   @OneToMany(() => Kill, (kill) => kill.victim)
   deaths: Kill[];
 
-  @OneToMany(() => PlayerGame, (playerGame) => playerGame.player)
-  playerGames: PlayerGame[];
+  @OneToMany(() => Score, (score) => score.player)
+  scores: Score[];
 
   get isWorld() {
     return this.name === WORLD_PLAYER_NAME;

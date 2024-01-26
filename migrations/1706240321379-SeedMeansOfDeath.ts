@@ -1,6 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class SeedMeansOfDeath1706232377458 implements MigrationInterface {
+export class SeedMeansOfDeath1706240321379 implements MigrationInterface {
+  name = 'SeedMeansOfDeath1706240321379';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     const meansOfDeathData = [
       { tag: 'MOD_UNKNOWN', description: 'unknown cause of death' },

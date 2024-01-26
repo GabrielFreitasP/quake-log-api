@@ -8,16 +8,16 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('players_games')
-export class PlayerGame {
+@Entity('scores')
+export class Score {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Player, (player) => player.playerGames)
+  @ManyToOne(() => Player, (player) => player.scores)
   @JoinColumn({ name: 'player_id' })
   player: Player;
 
-  @ManyToOne(() => Game, (game) => game.playerGames)
+  @ManyToOne(() => Game, (game) => game.scores)
   @JoinColumn({ name: 'game_id' })
   game: Game;
 

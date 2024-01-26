@@ -1,11 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { File } from './entities/file.entity';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { EntityManager, Repository } from 'typeorm';
 import { InvalidArgumentException } from '../commons/exceptions/invalid-argument.exception';
-import { FileMapper } from './mappers/file.mapper';
 import { FileReader } from '../commons/readers/file.reader';
 import { FileStatusEnum } from './enums/file-status.enum';
 import { KillService } from '../kill/kill.service';
@@ -16,11 +15,14 @@ import { LogTagEnum } from './enums/log-tag.enum';
 import { LineTypeEnum } from './enums/line-type.enum';
 import { Game } from '../game/entities/game.entity';
 import { MeansOfDeath } from '../meansofdeath/entities/means-of-death.entity';
-import { GameBuilder } from '../game/builder/game.builder';
+import { BuildGame } from '../game/builder/game.builder';
+import { LoggerService } from '../commons/logger/logger.service';
+import { ScoreService } from '../score/score.service';
+import { FindGamesDto } from './dto/find-games.dto';
+import { GameByFileDto } from '../game/dto/game-by-file.dto';
+import { MulterFileToFileEntity } from './mappers/file.mapper';
 
 import configuration from '../commons/config/configuration';
-import { LoggerService } from '../commons/logger/logger.service';
-import { PlayerGameService } from '../playergame/player-game.service';
 
 @Injectable()
 export class FileService {
@@ -33,7 +35,7 @@ export class FileService {
     private readonly killService: KillService,
     private readonly meansOfDeathService: MeansOfDeathService,
     private readonly playerService: PlayerService,
-    private readonly playerGameService: PlayerGameService,
+    private readonly scoreService: ScoreService,
   ) {}
 
   async findAll() {
@@ -44,7 +46,34 @@ export class FileService {
     return await this.repository.findOneBy({ id });
   }
 
-  async findGamesById(id: string) {}
+  async findGamesById(id: string) {
+    const files = await this.repository.find({
+      where: { id },
+      relations: ['games', 'games.scores', 'games.scores.player'],
+    });
+
+    if (files.length === 0) {
+      throw new NotFoundException(File, 'file not found');
+    }
+
+    const fileEntity = files[0];
+    const games: FindGamesDto = {};
+    fileEntity.games.forEach(({ totalKills, scores }, index) => {
+      const game = new GameByFileDto();
+      game.totalKills = totalKills;
+
+      game.players = scores.map(({ player }) => player.name);
+
+      game.kills = {};
+      scores.forEach(({ player, score }) => {
+        game.kills[player.name] = score;
+      });
+
+      games[Game.buildNameByIndex(index)] = game;
+    });
+
+    return games;
+  }
 
   async create(fileEntity: File, manager?: EntityManager) {
     if (manager) {
@@ -72,7 +101,7 @@ export class FileService {
       throw new InvalidArgumentException({ file });
     }
 
-    const fileEntity = FileMapper.multerFileToFileEntity(file);
+    const fileEntity = MulterFileToFileEntity(file);
     const newFileEntity = await this.create(fileEntity);
 
     await this.queue.add(configuration().files.jobName, newFileEntity);
@@ -161,8 +190,7 @@ export class FileService {
   }
 
   private addGame(fileEntity: File) {
-    const gameNumber = (fileEntity.games?.length ?? 0) + 1;
-    const game = GameBuilder.buildGame(fileEntity, gameNumber);
+    const game = BuildGame(fileEntity);
     fileEntity.games.push(game);
     return game;
   }
@@ -175,8 +203,8 @@ export class FileService {
   ) {
     const playerName = this.playerService.extractNameFromLine(line);
 
-    const gamePlayer = game.players.find(({ name }) => name === playerName);
-    if (gamePlayer) return;
+    const players = game.players.find(({ name }) => name === playerName);
+    if (players) return;
 
     const player = await this.playerService.findOrCreateByName(
       playerName,
@@ -185,7 +213,7 @@ export class FileService {
       manager,
     );
 
-    game.players.push(player);
+    game.addPlayer(player);
   }
 
   private async addKill(
@@ -203,7 +231,7 @@ export class FileService {
       manager,
     );
 
-    this.playerGameService.setScoreByKill(game, kill);
+    this.scoreService.setScoreByKill(game, kill);
 
     game.killFeed.push(kill);
   }
