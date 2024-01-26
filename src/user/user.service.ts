@@ -19,30 +19,28 @@ export class UserService {
 
   async create(userCreateDto: RequestUserDto) {
     this.loggerService.debug(
-      `Starting to create a new user. Email: ${userCreateDto.email}`,
+      `Creating a new user. Email: ${userCreateDto.email}.`,
     );
 
-    const newUser = new User({
-      ...userCreateDto,
-    });
+    const newUser = new User({ ...userCreateDto });
 
     try {
       await this.repository.save(newUser);
     } catch (error) {
-      if (error.code === 'ER_DUP_ENTRY') {
+      if (error.code === '23505') {
         this.loggerService.warn(
-          `User already exists in the database. Email: ${userCreateDto.email}`,
+          `User already exists in the database. Email: ${userCreateDto.email}.`,
         );
 
         throw new ConflictException(
-          `User with email '${newUser.email}' already exists`,
+          `User with email '${newUser.email}' already exists.`,
         );
       }
 
       this.loggerService.error(
-        `Error creating user. Email: ${userCreateDto.email}`,
+        `Error creating user. Email: ${userCreateDto.email}. Message: ${error.message}.`,
       );
-      throw new InternalServerErrorException('Error creating user');
+      throw new InternalServerErrorException('Error creating user.');
     }
   }
 
