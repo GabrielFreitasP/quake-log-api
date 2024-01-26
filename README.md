@@ -6,6 +6,19 @@ The Quake Log API is a powerful tool that enables in-depth analysis of Quake III
 
 ## Features
 
+### Authentication with JWT
+
+The Quake Log API incorporates JWT (JSON Web Token) authentication for secure user access. The authentication process involves obtaining a token by making a request to the following routes:
+
+- `POST - /api/v1/users`: Allows users to register and create an account.
+- `POST - /api/v1/login`: Enables users to log in and obtain the JWT token.
+
+These routes are intentionally open and do not require authentication, allowing users to register and obtain the necessary token to access other routes securely.
+
+Once a user successfully logs in and obtains the JWT token, they can include this token in the headers of subsequent requests to protected routes. The API will then validate the token, granting access to the authorized features.
+
+This JWT-based authentication ensures a secure and controlled environment, allowing users to leverage the full functionality of the Quake Log API while maintaining data integrity and privacy.
+
 ### Upload of Log Files
 
 The file upload process is carried out through the `POST - /api/v1/files/upload` endpoint. The API receives the file, stores it in a folder on the server (simulating a Bucket), persists the file information in the database, and adds it to an internal queue for asynchronous processing through a Job. This Job extracts the information from the file in the queue, reads the file content in the simulated Bucket (folder `./uploads`), and processes the log data (matches, kills, players), persisting them in the database.
@@ -18,7 +31,7 @@ Based on the uploaded data, comprehensive reports can be generated about games, 
 
 **1. List of kills in a match**
 
-`GET - /api/v1/games/{id}/kill-feed`
+`GET - /api/v1/games/:gameId/kill-feed`
 
 **Example response:**
 
@@ -32,7 +45,7 @@ Based on the uploaded data, comprehensive reports can be generated about games, 
 
 **2. Kills by players in a file (separated by games)**
 
-`GET - /api/v1/files/{id}/kills-by-players`
+`GET - /api/v1/files/:filesId/kills-by-players`
 
 **Example response:**
 
@@ -69,11 +82,11 @@ Based on the uploaded data, comprehensive reports can be generated about games, 
 }
 ```
 
-Note: The same data can also be obtained by searching for a specific match at `GET - /api/v1/games/{id}/kills-by-players`.
+Note: The same data can also be obtained by searching for a specific match at `GET - /api/v1/games/:gameId/kills-by-players`.
 
 **3. Kills by means in a file (separated by games)**
 
-`GET - /api/v1/files/{id}/kills-by-means)`
+`GET - /api/v1/files/:filesId/kills-by-means`
 
 **Example response:**
 
@@ -96,7 +109,7 @@ Note: The same data can also be obtained by searching for a specific match at `G
 }
 ```
 
-Note: The same data can also be obtained by searching for a specific match at `GET - /api/v1/games/{id}/kills-by-means`.
+Note: The same data can also be obtained by searching for a specific match at `GET - /api/v1/games/:gameId/kills-by-means`.
 
 ## Used Technologies
 
