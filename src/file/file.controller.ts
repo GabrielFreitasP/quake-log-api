@@ -15,6 +15,21 @@ import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 export class FileController {
   constructor(private readonly filesService: FileService) {}
 
+  @Get()
+  async findAll() {
+    return await this.filesService.findAll();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return await this.filesService.findOne(id);
+  }
+
+  @Get(':id/games')
+  async findGamesById(@Param('id') id: string) {
+    return await this.filesService.findGamesById(id);
+  }
+
   @Post('upload')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -31,15 +46,5 @@ export class FileController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     return await this.filesService.uploadFile(file);
-  }
-
-  @Get()
-  async findAll() {
-    return await this.filesService.findAll();
-  }
-
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.filesService.findOne(id);
   }
 }

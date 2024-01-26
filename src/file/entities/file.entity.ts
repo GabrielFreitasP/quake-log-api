@@ -27,7 +27,7 @@ export class File {
   @Column()
   mimeType: string;
 
-  @Column()
+  @Column({ type: 'int' })
   size: number;
 
   @Column()

@@ -3,13 +3,14 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Game } from '../../game/entities/game.entity';
 import { Kill } from '../../kill/entities/kill.entity';
+import { Score } from '../../score/entities/score.entity';
+
+const WORLD_PLAYER_NAME = '<world>';
 
 @Entity('players')
 export class Player {
@@ -28,12 +29,16 @@ export class Player {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ManyToMany(() => Game, (game) => game.players)
-  games: Game[];
-
   @OneToMany(() => Kill, (kill) => kill.killer)
   kills: Kill[];
 
   @OneToMany(() => Kill, (kill) => kill.victim)
   deaths: Kill[];
+
+  @OneToMany(() => Score, (score) => score.player)
+  scores: Score[];
+
+  get isWorld() {
+    return this.name === WORLD_PLAYER_NAME;
+  }
 }

@@ -1,11 +1,10 @@
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -14,6 +13,8 @@ import {
 import { File } from '../../file/entities/file.entity';
 import { Player } from '../../player/entities/player.entity';
 import { Kill } from '../../kill/entities/kill.entity';
+import { Score } from '../../score/entities/score.entity';
+import { BuildScore } from '../../score/builder/score.builder';
 
 @Entity('games')
 export class Game {
@@ -24,8 +25,8 @@ export class Game {
   @JoinColumn()
   file: File;
 
-  @Column()
-  name: string;
+  @Column({ type: 'int', default: 0 })
+  totalKills: number;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -36,18 +37,30 @@ export class Game {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ManyToMany(() => Player, (player) => player.games)
-  @JoinTable({
-    name: 'games_players',
-    joinColumn: { name: 'game_id' },
-    inverseJoinColumn: { name: 'player_id' },
-  })
-  players: Player[];
-
   @OneToMany(() => Kill, (kill) => kill.game, { cascade: true })
   killFeed: Kill[];
 
-  static generateNameByNumber(number: number): string {
-    return `Game ${number}`;
+  @OneToMany(() => Score, (scores) => scores.game, {
+    cascade: true,
+  })
+  scores: Score[];
+
+  static buildNameByIndex(index: number) {
+    return `game${index + 1}`;
+  }
+
+  get players() {
+    return this.scores?.map((score) => score.player);
+  }
+
+  addPlayer(player: Player) {
+    if (!this.scores) this.scores = [];
+    this.scores.push(BuildScore(this, player, 0));
+  }
+
+  @BeforeInsert()
+  setTotalKill() {
+    if (!this.killFeed) return 0;
+    this.totalKills = this.killFeed.length;
   }
 }
