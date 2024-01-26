@@ -21,4 +21,14 @@ export class GameController {
   findKillFeed(@Param('id') id: string) {
     return this.gameService.findKillFeed(id);
   }
+
+  @Get(':id/kills-by-players')
+  findKillsByPlayers(@Param('id') id: string) {
+    return this.gameService.findKillsByPlayers(id);
+  }
+
+  @Get(':id/kills-by-means')
+  findKillsByMeans(@Param('id') id: string) {
+    return this.gameService.findKillsByMeans(id);
+  }
 }

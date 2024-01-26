@@ -15,22 +15,23 @@ import { LogTagEnum } from './enums/log-tag.enum';
 import { LineTypeEnum } from './enums/line-type.enum';
 import { Game } from '../game/entities/game.entity';
 import { MeansOfDeath } from '../meansofdeath/entities/means-of-death.entity';
-import { BuildGame } from '../game/builder/game.builder';
 import { LoggerService } from '../commons/logger/logger.service';
 import { ScoreService } from '../score/score.service';
-import { FindGamesDto } from './dto/find-games.dto';
-import { GameByFileDto } from '../game/dto/game-by-file.dto';
+import { KillsByPlayersDto } from '../game/dto/kills-by-players.dto';
+import { KillsByMeansDto } from '../game/dto/kills-by-means.dto';
+import { BuildGame } from '../game/builder/game.builder';
 import { MulterFileToFileEntity } from './mappers/file.mapper';
+import { GameEntityToKillsByPlayersDto } from '../game/mappers/game.mapper';
 
 import configuration from '../commons/config/configuration';
 
 @Injectable()
 export class FileService {
   constructor(
-    @InjectRepository(File)
-    private readonly repository: Repository<File>,
     @InjectQueue(configuration().files.queueName)
     private readonly queue: Queue<File>,
+    @InjectRepository(File)
+    private readonly repository: Repository<File>,
     private readonly loggerService: LoggerService,
     private readonly killService: KillService,
     private readonly meansOfDeathService: MeansOfDeathService,
@@ -46,7 +47,7 @@ export class FileService {
     return await this.repository.findOneBy({ id });
   }
 
-  async findGamesById(id: string) {
+  async findKillsByPlayers(id: string) {
     const files = await this.repository.find({
       where: { id },
       relations: ['games', 'games.scores', 'games.scores.player'],
@@ -57,19 +58,44 @@ export class FileService {
     }
 
     const fileEntity = files[0];
-    const games: FindGamesDto = {};
-    fileEntity.games.forEach(({ totalKills, scores }, index) => {
-      const game = new GameByFileDto();
-      game.totalKills = totalKills;
+    const games: Record<string, KillsByPlayersDto> = {};
+    fileEntity.games.forEach((game, index) => {
+      games[Game.buildNameByIndex(index)] = GameEntityToKillsByPlayersDto(game);
+    });
 
-      game.players = scores.map(({ player }) => player.name);
+    return games;
+  }
 
-      game.kills = {};
-      scores.forEach(({ player, score }) => {
-        game.kills[player.name] = score;
-      });
+  async findKillsByMeans(id: string) {
+    const result = await this.repository
+      .createQueryBuilder('file')
+      .select('game.id', 'gameId')
+      .addSelect('meansOfDeath.tag', 'tag')
+      .addSelect('count(1)', 'killCount')
+      .innerJoin('file.games', 'game')
+      .innerJoin('game.kills', 'kill')
+      .innerJoin('kill.meansOfDeath', 'meansOfDeath')
+      .where('file.id = :id', { id })
+      .groupBy('game.id, meansOfDeath.tag')
+      .getRawMany();
 
-      games[Game.buildNameByIndex(index)] = game;
+    const games: Record<string, KillsByMeansDto> = {};
+    const gameIds: string[] = [];
+    result.forEach(({ gameId, tag, killCount }) => {
+      let index = gameIds.findIndex((id) => id === gameId);
+      if (index === -1) {
+        gameIds.push(gameId);
+        index = gameIds.length - 1;
+      }
+
+      if (!games[Game.buildNameByIndex(index)]) {
+        games[Game.buildNameByIndex(index)] = {
+          killsByMeans: {},
+        };
+      }
+
+      games[Game.buildNameByIndex(index)].killsByMeans[tag] =
+        parseInt(killCount);
     });
 
     return games;
