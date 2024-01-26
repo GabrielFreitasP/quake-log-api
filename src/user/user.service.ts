@@ -12,15 +12,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class UserService {
   constructor(
-    private readonly loggerService: LoggerService,
+    private readonly logger: LoggerService,
     @InjectRepository(User)
     private readonly repository: Repository<User>,
   ) {}
 
   async create(userCreateDto: RequestUserDto) {
-    this.loggerService.debug(
-      `Creating a new user. Email: ${userCreateDto.email}.`,
-    );
+    this.logger.debug(`Creating a new user: ${userCreateDto.email}`);
 
     const newUser = new User({ ...userCreateDto });
 
@@ -28,19 +26,19 @@ export class UserService {
       await this.repository.save(newUser);
     } catch (error) {
       if (error.code === '23505') {
-        this.loggerService.warn(
-          `User already exists in the database. Email: ${userCreateDto.email}.`,
+        this.logger.warn(
+          `User already exists in the database: ${userCreateDto.email}`,
         );
 
         throw new ConflictException(
-          `User with email '${newUser.email}' already exists.`,
+          `User with email ${newUser.email} already exists`,
         );
       }
 
-      this.loggerService.error(
-        `Error creating user. Email: ${userCreateDto.email}. Message: ${error.message}.`,
+      this.logger.error(
+        `Error creating user with email ${userCreateDto.email}: ${error.message}`,
       );
-      throw new InternalServerErrorException('Error creating user.');
+      throw new InternalServerErrorException('Error creating user');
     }
   }
 
