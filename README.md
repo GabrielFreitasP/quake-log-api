@@ -10,6 +10,8 @@ The Quake Log API is a powerful tool that enables in-depth analysis of Quake III
 
 The file upload process is carried out through the `POST - /api/v1/files/upload` endpoint. The API receives the file, stores it in a folder on the server (simulating a Bucket), persists the file information in the database, and adds it to an internal queue for asynchronous processing through a Job. This Job extracts the information from the file in the queue, reads the file content in the simulated Bucket (folder `./uploads`), and processes the log data (matches, kills, players), persisting them in the database.
 
+![upload-file-sequence-diagram](./docs/upload-file-sequence-diagram.png)
+
 ### Match Reports
 
 Based on the uploaded data, comprehensive reports can be generated about games, scores, players, and kills. This data can be retrieved for a specific game or file. Examples below:
@@ -186,6 +188,7 @@ The project structure is organized to facilitate understanding and maintenance o
 | Name                                | Description                                                                                                                                                                |
 |-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **dist**                            | Contains the output of the TypeScript compilation, i.e., the JavaScript files resulting from the build process. This folder is not versioned and is dynamically generated. |
+| **docs**                            | Documentation files, including API documentation, user guides, and any other relevant documentation.                                                                       |
 | **node_modules**                    | Stores all project dependencies installed via npm. This folder is generated automatically and is not versioned.                                                            |
 | **src**                             | Contains the main source code of the application, which will be compiled to the `dist` folder.                                                                             |
 | **src/auth/guards**                 | Implementation of authentication guards to protect specific API routes.                                                                                                    |
