@@ -16,15 +16,15 @@ export class Kill {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Game, (game) => game.players)
+  @ManyToOne(() => Game, (game) => game.killFeed)
   @JoinColumn()
   game: Game;
 
-  @ManyToOne(() => Player, (player) => player.kills)
+  @ManyToOne(() => Player, (player) => player.kills, { eager: true })
   @JoinColumn()
   killer: Player;
 
-  @ManyToOne(() => Player, (player) => player.deaths)
+  @ManyToOne(() => Player, (player) => player.deaths, { eager: true })
   @JoinColumn()
   victim: Player;
 
