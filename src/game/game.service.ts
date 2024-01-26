@@ -22,10 +22,10 @@ export class GameService {
     const games = await this.repository.find({
       where: { id },
       relations: [
-        'killFeed',
-        'killFeed.killer',
-        'killFeed.victim',
-        'killFeed.meansOfDeath',
+        'kills',
+        'kills.killer',
+        'kills.victim',
+        'kills.meansOfDeath',
       ],
     });
 

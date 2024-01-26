@@ -9,10 +9,10 @@ import { FileConsumer } from './file.consumer';
 import { KillModule } from '../kill/kill.module';
 import { MeansOfDeathModule } from '../meansofdeath/means-of-death.module';
 import { PlayerModule } from '../player/player.module';
-
-import configuration from '../commons/config/configuration';
 import { LoggerModule } from '../commons/logger/logger.module';
 import { ScoreModule } from '../score/score.module';
+
+import configuration from '../commons/config/configuration';
 
 @Module({
   imports: [

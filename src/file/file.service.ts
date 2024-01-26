@@ -233,6 +233,6 @@ export class FileService {
 
     this.scoreService.setScoreByKill(game, kill);
 
-    game.killFeed.push(kill);
+    game.kills.push(kill);
   }
 }

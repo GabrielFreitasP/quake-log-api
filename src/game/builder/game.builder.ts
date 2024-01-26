@@ -5,6 +5,6 @@ export const BuildGame = (fileEntity: File) => {
   const game = new Game();
   game.file = fileEntity;
   game.scores = [];
-  game.killFeed = [];
+  game.kills = [];
   return game;
 };

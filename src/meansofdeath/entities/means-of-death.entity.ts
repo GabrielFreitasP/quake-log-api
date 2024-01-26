@@ -30,5 +30,5 @@ export class MeansOfDeath {
   deletedAt: Date;
 
   @OneToMany(() => Kill, (kill) => kill.meansOfDeath)
-  killFeed: Kill[];
+  kills: Kill[];
 }
