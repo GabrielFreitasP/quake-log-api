@@ -16,7 +16,7 @@ export class Kill {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Game, (game) => game.killFeed)
+  @ManyToOne(() => Game, (game) => game.kills)
   @JoinColumn()
   game: Game;
 
@@ -28,7 +28,7 @@ export class Kill {
   @JoinColumn()
   victim: Player;
 
-  @ManyToOne(() => MeansOfDeath, (meansOfDeath) => meansOfDeath.killFeed)
+  @ManyToOne(() => MeansOfDeath, (meansOfDeath) => meansOfDeath.kills)
   @JoinColumn()
   meansOfDeath: MeansOfDeath;
 

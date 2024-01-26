@@ -16,18 +16,23 @@ export class FileController {
   constructor(private readonly filesService: FileService) {}
 
   @Get()
-  async findAll() {
-    return await this.filesService.findAll();
+  findAll() {
+    return this.filesService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return await this.filesService.findOne(id);
+  findOne(@Param('id') id: string) {
+    return this.filesService.findOne(id);
   }
 
-  @Get(':id/games')
-  async findGamesById(@Param('id') id: string) {
-    return await this.filesService.findGamesById(id);
+  @Get(':id/kills-by-players')
+  findGamesById(@Param('id') id: string) {
+    return this.filesService.findKillsByPlayers(id);
+  }
+
+  @Get(':id/kills-by-means')
+  findKillsByMeans(@Param('id') id: string) {
+    return this.filesService.findKillsByMeans(id);
   }
 
   @Post('upload')
@@ -44,7 +49,7 @@ export class FileController {
     },
   })
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return await this.filesService.uploadFile(file);
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    return this.filesService.uploadFile(file);
   }
 }

@@ -38,7 +38,7 @@ export class Game {
   deletedAt: Date;
 
   @OneToMany(() => Kill, (kill) => kill.game, { cascade: true })
-  killFeed: Kill[];
+  kills: Kill[];
 
   @OneToMany(() => Score, (scores) => scores.game, {
     cascade: true,
@@ -60,7 +60,7 @@ export class Game {
 
   @BeforeInsert()
   setTotalKill() {
-    if (!this.killFeed) return 0;
-    this.totalKills = this.killFeed.length;
+    if (!this.kills) return 0;
+    this.totalKills = this.kills.length;
   }
 }
