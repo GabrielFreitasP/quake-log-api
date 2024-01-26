@@ -1,11 +1,10 @@
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -14,6 +13,7 @@ import {
 import { File } from '../../file/entities/file.entity';
 import { Player } from '../../player/entities/player.entity';
 import { Kill } from '../../kill/entities/kill.entity';
+import { PlayerGame } from '../../playergame/entities/player-game.entity';
 
 @Entity('games')
 export class Game {
@@ -27,6 +27,9 @@ export class Game {
   @Column()
   name: string;
 
+  @Column({ type: 'int', default: 0 })
+  totalKills: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -36,16 +39,21 @@ export class Game {
   @DeleteDateColumn()
   deletedAt: Date;
 
-  @ManyToMany(() => Player, (player) => player.games)
-  @JoinTable({
-    name: 'games_players',
-    joinColumn: { name: 'game_id' },
-    inverseJoinColumn: { name: 'player_id' },
-  })
-  players: Player[];
-
   @OneToMany(() => Kill, (kill) => kill.game, { cascade: true })
   killFeed: Kill[];
+
+  @OneToMany(() => PlayerGame, (playerGame) => playerGame.game, {
+    cascade: true,
+  })
+  playerGames: PlayerGame[];
+
+  players: Player[];
+
+  @BeforeInsert()
+  setTotalKill() {
+    if (!this.killFeed) return 0;
+    this.totalKills = this.killFeed.length;
+  }
 
   static generateNameByNumber(number: number): string {
     return `Game ${number}`;
