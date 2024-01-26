@@ -16,4 +16,9 @@ export class GameController {
   findOne(@Param('id') id: string) {
     return this.gameService.findOne(id);
   }
+
+  @Get(':id/kill-feed')
+  findKillFeed(@Param('id') id: string) {
+    return this.gameService.findKillFeed(id);
+  }
 }

@@ -40,4 +40,10 @@ export class Kill {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+  toText() {
+    return this.killer.isWorld
+      ? `The player "${this.victim.name}" died because ${this.meansOfDeath.description}.`
+      : `The player "${this.killer.name}" killed the player "${this.victim.name}" using ${this.meansOfDeath.description}.`;
+  }
 }
