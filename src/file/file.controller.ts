@@ -5,6 +5,7 @@ import {
   Param,
   UploadedFile,
   UseInterceptors,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { FileService } from './file.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -23,17 +24,17 @@ export class FileController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.filesService.findOne(id);
   }
 
   @Get(':id/kills-by-players')
-  findGamesById(@Param('id') id: string) {
+  findGamesById(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.filesService.findKillsByPlayers(id);
   }
 
   @Get(':id/kills-by-means')
-  findKillsByMeans(@Param('id') id: string) {
+  findKillsByMeans(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.filesService.findKillsByMeans(id);
   }
 
