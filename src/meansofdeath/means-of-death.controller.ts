@@ -1,9 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { MeansOfDeathService } from './means-of-death.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-@ApiTags('meansOfDeath')
-@Controller('meansOfDeath')
+@Controller('api/v1/means-of-death')
+@ApiTags('means-of-death')
+@ApiBearerAuth()
 export class MeansOfDeathController {
   constructor(private readonly playerService: MeansOfDeathService) {}
 

@@ -1,9 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { GameService } from './game.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@Controller('api/v1/games')
 @ApiTags('games')
-@Controller('games')
+@ApiBearerAuth()
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 

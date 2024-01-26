@@ -8,10 +8,12 @@ import {
 } from '@nestjs/common';
 import { FileService } from './file.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { HttpSuccessFilter } from '../commons/filters/http-success.filter';
 
+@Controller('api/v1/files')
 @ApiTags('files')
-@Controller('files')
+@ApiBearerAuth()
 export class FileController {
   constructor(private readonly filesService: FileService) {}
 
@@ -37,6 +39,7 @@ export class FileController {
 
   @Post('upload')
   @ApiConsumes('multipart/form-data')
+  @UseInterceptors(HttpSuccessFilter)
   @ApiBody({
     schema: {
       type: 'object',

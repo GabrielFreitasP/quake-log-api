@@ -1,9 +1,10 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { KillService } from './kill.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@Controller('api/v1/kills')
 @ApiTags('kills')
-@Controller('kills')
+@ApiBearerAuth()
 export class KillController {
   constructor(private readonly playerService: KillService) {}
 
