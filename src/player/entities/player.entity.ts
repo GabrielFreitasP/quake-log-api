@@ -9,12 +9,14 @@ import {
 } from 'typeorm';
 import { Kill } from '../../kill/entities/kill.entity';
 import { Score } from '../../score/entities/score.entity';
+import { IsUUID } from 'class-validator';
 
 const WORLD_PLAYER_NAME = '<world>';
 
 @Entity('players')
 export class Player {
   @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   id: string;
 
   @Column({ unique: true })

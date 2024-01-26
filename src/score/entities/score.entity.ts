@@ -7,10 +7,12 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { IsUUID } from 'class-validator';
 
 @Entity('scores')
 export class Score {
   @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   id: string;
 
   @ManyToOne(() => Player, (player) => player.scores)

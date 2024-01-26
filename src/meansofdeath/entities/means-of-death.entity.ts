@@ -8,10 +8,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Kill } from '../../kill/entities/kill.entity';
+import { IsUUID } from 'class-validator';
 
 @Entity('means_of_death')
 export class MeansOfDeath {
   @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   id: string;
 
   @Column({ unique: true })

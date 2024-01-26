@@ -60,4 +60,12 @@ export class ConfigurationService {
   get loggerLabel(): string {
     return this.configService.get('logger.label');
   }
+
+  get authJwtSecret(): string {
+    return this.configService.get('auth.jwt.secret');
+  }
+
+  get authJwtExpiresIn(): string {
+    return this.configService.get('auth.jwt.expiresIn');
+  }
 }
