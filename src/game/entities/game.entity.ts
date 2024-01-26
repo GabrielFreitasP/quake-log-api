@@ -47,10 +47,6 @@ export class Game {
   })
   scores: Score[];
 
-  static buildNameByIndex(index: number) {
-    return `game${index + 1}`;
-  }
-
   get players() {
     return this.scores?.map((score) => score.player);
   }
@@ -64,5 +60,9 @@ export class Game {
   setTotalKill() {
     if (!this.kills) return 0;
     this.totalKills = this.kills.length;
+  }
+
+  static buildNameByIndex(index: number) {
+    return `game${index + 1}`;
   }
 }
