@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bull';
@@ -15,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigurationService } from './commons/config/configuration.service';
 
 import configuration from './commons/config/configuration';
+import { LoggerMiddleware } from './commons/middlware/logger.middleware';
 
 @Module({
   controllers: [AppController],
@@ -57,4 +58,9 @@ import configuration from './commons/config/configuration';
     FileModule,
   ],
 })
-export class AppModule {}
+export class AppModule {
+  // noinspection JSUnusedGlobalSymbols
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
