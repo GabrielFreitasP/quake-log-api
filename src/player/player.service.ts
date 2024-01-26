@@ -5,10 +5,12 @@ import { Player } from './entities/player.entity';
 import { Game } from '../game/entities/game.entity';
 import { BuildPlayer } from './builder/player.builder';
 import { LogTagEnum } from '../file/enums/log-tag.enum';
+import { LoggerService } from '../commons/logger/logger.service';
 
 @Injectable()
 export class PlayerService {
   constructor(
+    private readonly logger: LoggerService,
     @InjectRepository(Player)
     private readonly repository: Repository<Player>,
   ) {}
@@ -29,6 +31,7 @@ export class PlayerService {
   }
 
   async create(player: Player, manager?: EntityManager) {
+    this.logger.debug(`Creating player: ${player.name}`);
     if (manager) {
       return await manager.save(Player, player);
     }
@@ -37,7 +40,6 @@ export class PlayerService {
 
   async findOrCreateByName(
     playerName: string,
-    game: Game,
     cachedPlayers: Player[],
     manager: EntityManager,
   ) {
