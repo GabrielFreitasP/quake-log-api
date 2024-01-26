@@ -12,6 +12,7 @@ import { PlayerModule } from '../player/player.module';
 
 import configuration from '../commons/config/configuration';
 import { LoggerModule } from '../commons/logger/logger.module';
+import { PlayerGameModule } from '../playergame/player-game.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { LoggerModule } from '../commons/logger/logger.module';
     KillModule,
     MeansOfDeathModule,
     PlayerModule,
+    PlayerGameModule,
   ],
   controllers: [FileController],
   providers: [FileService, FileConsumer],

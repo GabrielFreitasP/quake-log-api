@@ -20,6 +20,7 @@ import { GameBuilder } from '../game/builder/game.builder';
 
 import configuration from '../commons/config/configuration';
 import { LoggerService } from '../commons/logger/logger.service';
+import { PlayerGameService } from '../playergame/player-game.service';
 
 @Injectable()
 export class FileService {
@@ -32,6 +33,7 @@ export class FileService {
     private readonly killService: KillService,
     private readonly meansOfDeathService: MeansOfDeathService,
     private readonly playerService: PlayerService,
+    private readonly playerGameService: PlayerGameService,
   ) {}
 
   async findAll() {
@@ -41,6 +43,8 @@ export class FileService {
   async findOne(id: string) {
     return await this.repository.findOneBy({ id });
   }
+
+  async findGamesById(id: string) {}
 
   async create(fileEntity: File, manager?: EntityManager) {
     if (manager) {
@@ -198,6 +202,8 @@ export class FileService {
       cachedMeansOfDeath,
       manager,
     );
+
+    this.playerGameService.setScoreByKill(game, kill);
 
     game.killFeed.push(kill);
   }
