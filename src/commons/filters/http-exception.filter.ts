@@ -4,9 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const hostName = require('os').hostname();
+import { Response } from 'express';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -14,18 +12,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const exceptionResponse = exception.getResponse() as HttpException;
-    const request = ctx.getRequest<Request>();
     const status = exception.getStatus();
 
     response.status(status).json({
-      meta: {
-        serverName: hostName,
-        path: request.url,
-        timestamp: new Date().toISOString(),
-      },
-      data: {
-        message: exceptionResponse.message,
-      },
+      statusCode: status,
+      message: exceptionResponse.message,
     });
   }
 }
