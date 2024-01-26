@@ -38,14 +38,12 @@ export class KillService {
 
     const killer = await this.playerService.findOrCreateByName(
       killerName,
-      game,
       cachedPlayers,
       manager,
     );
 
     const victim = await this.playerService.findOrCreateByName(
       victimName,
-      game,
       cachedPlayers,
       manager,
     );

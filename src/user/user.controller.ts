@@ -13,7 +13,7 @@ export class UserController {
   @ApiBody({ type: RequestUserDto })
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 201, description: 'User created' })
-  @ApiResponse({ status: 401, description: 'Not authorized' })
+  @ApiResponse({ status: 400, description: 'Invalid params' })
   @ApiResponse({ status: 403, description: 'Not allowed' })
   create(@Body() userCreateDto: RequestUserDto) {
     return this.userService.create(userCreateDto);

@@ -1,5 +1,5 @@
 export enum LineTypeEnum {
   START_GAME,
-  CHANGE_PLAYER,
+  CHANGED_PLAYER,
   KILL,
 }

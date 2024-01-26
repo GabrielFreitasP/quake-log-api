@@ -28,11 +28,11 @@ import configuration from '../commons/config/configuration';
 @Injectable()
 export class FileService {
   constructor(
+    private readonly logger: LoggerService,
     @InjectQueue(configuration().files.queueName)
     private readonly queue: Queue<File>,
     @InjectRepository(File)
     private readonly repository: Repository<File>,
-    private readonly loggerService: LoggerService,
     private readonly killService: KillService,
     private readonly meansOfDeathService: MeansOfDeathService,
     private readonly playerService: PlayerService,
@@ -102,6 +102,7 @@ export class FileService {
   }
 
   async create(fileEntity: File, manager?: EntityManager) {
+    this.logger.debug(`Creating file: ${fileEntity.fileName}`);
     if (manager) {
       return await manager.save(File, fileEntity);
     }
@@ -109,6 +110,7 @@ export class FileService {
   }
 
   async update(fileEntity: File, manager?: EntityManager) {
+    this.logger.debug(`Updating file: ${fileEntity.id}`);
     if (manager) {
       return await manager.save(File, fileEntity);
     }
@@ -116,6 +118,7 @@ export class FileService {
   }
 
   async updateStatus({ id, status }: File, manager?: EntityManager) {
+    this.logger.debug(`Updating file (${id}) status: ${status}`);
     if (manager) {
       return await manager.update(File, { id }, { status });
     }
@@ -123,6 +126,8 @@ export class FileService {
   }
 
   async uploadFile(file: Express.Multer.File) {
+    this.logger.debug(`Uploading file: ${file.filename}`);
+
     if (!file) {
       throw new InvalidArgumentException({ file });
     }
@@ -130,16 +135,19 @@ export class FileService {
     const fileEntity = MulterFileToFileEntity(file);
     const newFileEntity = await this.create(fileEntity);
 
+    this.logger.debug(`Add file (${fileEntity.id}) to queue: ${file.filename}`);
     await this.queue.add(configuration().files.jobName, newFileEntity);
 
     return newFileEntity;
   }
 
   async processFile(fileEntity: File) {
-    try {
-      fileEntity.status = FileStatusEnum.Processing;
-      await this.updateStatus(fileEntity);
+    this.logger.debug(`Starting processing file: ${fileEntity.id}`);
 
+    fileEntity.status = FileStatusEnum.Processing;
+    await this.updateStatus(fileEntity);
+
+    try {
       const lines = FileReader.readFileLines(fileEntity.path);
       const cachedMeansOfDeath = await this.meansOfDeathService.findAll();
       const cachedPlayers: Player[] = [];
@@ -161,8 +169,12 @@ export class FileService {
         fileEntity.status = FileStatusEnum.Done;
         await this.update(fileEntity, manager);
       });
+
+      this.logger.debug(`File processed successfully: ${fileEntity.id}`);
     } catch (e) {
-      this.loggerService.error(e);
+      this.logger.error(
+        `Error processing file (${fileEntity.id}): ${e.message}`,
+      );
 
       fileEntity.status = FileStatusEnum.Error;
       await this.updateStatus(fileEntity);
@@ -177,7 +189,7 @@ export class FileService {
     }
 
     if (line.includes(LogTagEnum.CLIENT_USER_INFO_CHANGED + ':')) {
-      return LineTypeEnum.CHANGE_PLAYER;
+      return LineTypeEnum.CHANGED_PLAYER;
     }
 
     if (line.includes(LogTagEnum.KILL + ':')) {
@@ -199,7 +211,7 @@ export class FileService {
       case LineTypeEnum.START_GAME:
         currentGame = this.addGame(fileEntity);
         break;
-      case LineTypeEnum.CHANGE_PLAYER:
+      case LineTypeEnum.CHANGED_PLAYER:
         await this.addPlayer(line, currentGame, cachedPlayers, manager);
         break;
       case LineTypeEnum.KILL:
@@ -234,7 +246,6 @@ export class FileService {
 
     const player = await this.playerService.findOrCreateByName(
       playerName,
-      game,
       cachedPlayers,
       manager,
     );
@@ -260,5 +271,9 @@ export class FileService {
     this.scoreService.setScoreByKill(game, kill);
 
     game.kills.push(kill);
+
+    this.logger.debug(
+      `Kill added (file ${game.file.id}) to game[${game?.file?.games?.length ?? 1}]: ${kill.killer.name} kill ${kill.victim.name} by ${kill.meansOfDeath.tag}`,
+    );
   }
 }
