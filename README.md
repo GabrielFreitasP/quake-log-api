@@ -11,7 +11,7 @@ The Quake Log API is a powerful tool that enables in-depth analysis of Quake III
 The Quake Log API incorporates JWT (JSON Web Token) authentication for secure user access. The authentication process involves obtaining a token by making a request to the following routes:
 
 - `POST - /api/v1/users`: Allows users to register and create an account.
-- `POST - /api/v1/login`: Enables users to log in and obtain the JWT token.
+- `POST - /api/v1/auth`: Enables users to log in and obtain the JWT token.
 
 These routes are intentionally open and do not require authentication, allowing users to register and obtain the necessary token to access other routes securely.
 
@@ -184,7 +184,7 @@ npm run start:dev
 
 Note: There are also variations for `debug` and `prod` (replace `dev`).
 
-### All in One
+### All in One (macOS and Linux)
 
 It's also possible to execute all the commands mentioned above at once by running the command:
 
