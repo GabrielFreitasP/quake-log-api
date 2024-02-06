@@ -5,7 +5,6 @@ import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
 import { ConfigurationService } from '../commons/config/configuration.service';
 
-const x = 0;
 @Injectable()
 export class AuthService {
   constructor(
@@ -20,7 +19,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    const result = bcrypt.compareSync(password.toString(), users[0].password);
+    const result = bcrypt.compareSync(password, users[0].password);
     if (!result) {
       throw new UnauthorizedException('Invalid password');
     }
