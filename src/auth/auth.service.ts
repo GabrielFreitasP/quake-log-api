@@ -5,6 +5,7 @@ import { UserService } from '../user/user.service';
 import { User } from '../user/entities/user.entity';
 import { ConfigurationService } from '../commons/config/configuration.service';
 
+const x = 0;
 @Injectable()
 export class AuthService {
   constructor(
@@ -13,22 +14,18 @@ export class AuthService {
     private configurationService: ConfigurationService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
+  async validateUser(email: string, password: string): Promise<User> {
     const users = await this.usersService.getByEmail(email);
     if (users.length === 0) {
       throw new UnauthorizedException('Invalid username or password');
     }
 
     const result = bcrypt.compareSync(password.toString(), users[0].password);
-    if (users[0] && result) {
-      return users[0];
-    }
-
     if (!result) {
       throw new UnauthorizedException('Invalid password');
-    } else if (!users[0]) {
-      throw new UnauthorizedException('Unauthorized user');
     }
+
+    return users[0];
   }
 
   async login(userEntity: User) {
